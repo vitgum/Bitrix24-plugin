@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="ehcache.xsd">
+
+  <defaultCache maxElementsInMemory="10000" eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="120"
+                diskSpoolBufferSizeMB="30"  diskExpiryThreadIntervalSeconds="120"
+                memoryStoreEvictionPolicy="LRU" statistics="false">
+  </defaultCache>
+
+  <cache name="applications" maxElementsInMemory="10000" eternal="false" timeToLiveSeconds="3600"/>
+  <cache name="users" maxElementsInMemory="10000" eternal="false" timeToLiveSeconds="3600"/>
+  <cache name="chats" maxElementsInMemory="10000" eternal="false" timeToLiveSeconds="3600"/>
+  <cache name="operators" maxElementsInMemory="10000" eternal="false" timeToLiveSeconds="3600"/>
+  <cache name="queues" maxElementsInMemory="10000" eternal="false" timeToLiveSeconds="3600"/>
+</ehcache>
