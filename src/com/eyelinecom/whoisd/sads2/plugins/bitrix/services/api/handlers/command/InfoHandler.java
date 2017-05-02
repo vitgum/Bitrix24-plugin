@@ -43,14 +43,14 @@ public class InfoHandler extends CommonEventHandler implements CommandHandler {
     final String dialogId = ParamsExtractor.getDialogId(parameters);
 
     UserCounters counters = queueController.getUserCounters(application);
+    final String appLang = application.getLanguage();
 
     if (!counters.hasAwaitingUsers()) {
-      messageDeliveryService.sendMessageToChat(application, dialogId, getLocalizedMessage(parameters, "no.users"));
+      messageDeliveryService.sendMessageToChat(application, dialogId, getLocalizedMessage(appLang, "no.users"));
       return;
     }
-
-    String notification = getLocalizedMessage(parameters,"awaiting.users", counters.getAwaitingUsersCount() + "") + "\n" +
-      getLocalizedMessage(parameters,"processing.users", counters.getProcessingUsersCount() + "");
+    String notification = getLocalizedMessage(appLang,"awaiting.users", counters.getAwaitingUsersCount() + "") + "\n" +
+      getLocalizedMessage(appLang,"processing.users", counters.getProcessingUsersCount() + "");
     messageDeliveryService.sendMessageToChat(application, dialogId, notification);
   }
 }

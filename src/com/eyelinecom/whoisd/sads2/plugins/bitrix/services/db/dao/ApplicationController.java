@@ -15,13 +15,14 @@ public class ApplicationController {
     this.db = db;
   }
 
-  public Application create(String domain, String accessToken, String refreshToken, Integer botId) {
+  public Application create(String domain, String accessToken, String refreshToken, Integer botId, String language) {
     return db.tx(s -> {
       Application application = new Application();
       application.setDomain(domain);
       application.setAccessToken(accessToken);
       application.setRefreshToken(refreshToken);
       application.setBotId(botId);
+      application.setLanguage(language);
       s.save(application);
       return application;
     });
@@ -43,8 +44,7 @@ public class ApplicationController {
   public void delete(Integer id) {
     db.vtx(s -> {
       Application application = (Application) ApplicationQuery.byId(id, s).uniqueResult();
-      application.setDeleted(true);
-      s.save(application);
+      s.delete(application);
     });
   }
 }

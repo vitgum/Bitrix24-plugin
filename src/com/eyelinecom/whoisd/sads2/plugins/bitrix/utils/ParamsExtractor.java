@@ -70,6 +70,9 @@ public class ParamsExtractor {
 
   public static String getLanguage(Map<String, String[]> parameters) {
     try {
+      if (parameters.containsKey("data[LANGUAGE_ID]"))
+        return parameters.get("data[LANGUAGE_ID]")[0];
+
       return parameters.containsKey("lang") ? parameters.get("lang")[0] : parameters.get("data[PARAMS][LANGUAGE]")[0];
     } catch (Exception ex) {
       logger.error("Unable to extract language", ex);

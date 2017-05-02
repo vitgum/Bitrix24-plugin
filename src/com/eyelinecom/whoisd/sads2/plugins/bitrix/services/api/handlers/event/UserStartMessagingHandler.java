@@ -65,7 +65,7 @@ public class UserStartMessagingHandler extends CommonEventHandler implements Eve
     final String redirectBackPageUrl = TemplateUtils.createRedirectBackPageUrl(deployUrl, domain, userId, serviceId, protocol, lang, encodedAndEscapedBackPageOriginal);
     final String escapedRedirectBackPageUrl = EncodingUtils.escape(redirectBackPageUrl);
     final String encodedAndEscapedRedirectBackPageUrl = EncodingUtils.encode(escapedRedirectBackPageUrl);
-    final String inputTitle = getLocalizedMessage(parameters, "init.message.for.user");
+    final String inputTitle = getLocalizedMessage(lang, "init.message.for.user");
     final String inputUrl = TemplateUtils.createInputUrl(deployUrl, domain, lang, encodedAndEscapedRedirectBackPageUrl);
     final String escapedInputUrl = EncodingUtils.escape(inputUrl);
     final String xml = TemplateUtils.createBasicPage(inputTitle, escapedInputUrl, escapedRedirectBackPageUrl, lang);

@@ -81,10 +81,11 @@ public class MessageFromUserHandler extends CommonEventHandler implements EventH
     Queue queue = queueController.addToAwaitingQueue(application, user, serviceId, protocol, redirectBackPage, lang);
     queueController.storeMessage(queue, message);
 
+    final String appLang = application.getLanguage();
     UserCounters counters = queueController.getUserCounters(application);
-    String notification =  getLocalizedMessage(parameters,"new.user.arrived") + "\n" +
-      getLocalizedMessage(parameters,"awaiting.users", counters.getAwaitingUsersCount() + "") + "\n" +
-      getLocalizedMessage(parameters,"processing.users", counters.getProcessingUsersCount() + "");
+    String notification =  getLocalizedMessage(appLang,"new.user.arrived") + "\n" +
+      getLocalizedMessage(appLang,"awaiting.users", counters.getAwaitingUsersCount() + "") + "\n" +
+      getLocalizedMessage(appLang,"processing.users", counters.getProcessingUsersCount() + "");
 
     messageDeliveryService.sendMessageToAllChats(application, notification);
   }

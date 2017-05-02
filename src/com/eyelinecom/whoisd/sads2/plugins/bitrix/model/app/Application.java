@@ -10,7 +10,7 @@ import java.util.Date;
  * установка Битрикс24
  */
 @Entity
-@Table(name = "applications", uniqueConstraints=@UniqueConstraint(columnNames={"domain", "deleted"}))
+@Table(name = "applications")
 public class Application {
 
   @Id
@@ -18,7 +18,7 @@ public class Application {
   @Column(name = "id")
   private Integer id;
 
-  @Column(name = "domain", nullable = false, unique = false, length = 255)
+  @Column(name = "domain", nullable = false, unique = true, length = 255)
   private String domain;
 
   @Column(name = "access_token", nullable = false, unique = false)
@@ -30,8 +30,9 @@ public class Application {
   @Column(name = "bot_id", nullable = false, unique = false)
   private Integer botId;
 
-  @Column(name="deleted", nullable = false, unique = false)
-  private boolean deleted;
+  //язык установки Битрикс, используется при доставке сообщений операторам
+  @Column(name = "lang", nullable = false, unique = false, length = 7)
+  private String language;
 
   @CreationTimestamp
   @Column(name="create_date", unique = false, nullable = false)
@@ -77,12 +78,12 @@ public class Application {
     this.botId = botId;
   }
 
-  public boolean isDeleted() {
-    return deleted;
+  public String getLanguage() {
+    return language;
   }
 
-  public void setDeleted(boolean deleted) {
-    this.deleted = deleted;
+  public void setLanguage(String language) {
+    this.language = language;
   }
 
   public Date getCreateDate() {

@@ -1,7 +1,6 @@
 -- liquibase formatted sql
 -- changeset voronov:1
 
-
   CREATE SCHEMA IF NOT EXISTS sads_plugin_bitrix
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
@@ -11,8 +10,8 @@
         access_token varchar(255) not null,
         bot_id integer not null,
         create_date datetime not null,
-        deleted bit not null,
-        domain varchar(255) not null,
+        domain varchar(255) not null unique,
+        lang varchar(7) not null,
         last_modified datetime not null,
         refresh_token varchar(255) not null,
         primary key (id)
@@ -60,9 +59,6 @@
         user_id varchar(255) not null unique,
         primary key (id)
     ) ENGINE=InnoDB default CHARSET=utf8;
-
-    alter table applications
-        add constraint UK_oqsiyuqn9s3rniqscc90rbd66  unique (domain, deleted);
 
     alter table chats
         add constraint UK_67fd77ic4338jgxvbjlr3isx5  unique (app_id, chat_id, type);
@@ -113,7 +109,6 @@
 -- rollback ALTER TABLE queues DROP INDEX UK_li121ekg9s1p936ockm6gpdu3;
 -- rollback ALTER TABLE operators DROP INDEX UK_72wmvflvdyix8cdq47hxqnwr0;
 -- rollback ALTER TABLE chats DROP INDEX UK_67fd77ic4338jgxvbjlr3isx5;
--- rollback ALTER TABLE applications DROP INDEX UK_oqsiyuqn9s3rniqscc90rbd66;
 
 -- rollback DROP TABLE users;
 -- rollback DROP TABLE queues;

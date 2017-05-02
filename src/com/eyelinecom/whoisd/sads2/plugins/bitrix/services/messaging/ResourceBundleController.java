@@ -32,15 +32,20 @@ public class ResourceBundleController {
     }
   }
 
-  public PropertyResourceBundle getResourceBundle(String lang) {
+  public String getMessage(String lang, String key, String ... args) {
+    String message = getMessage(lang, key);
+    return args.length > 0 ? String.format(message, args) : message;
+  }
+
+  private String getMessage(String lang, String key) {
+    PropertyResourceBundle bundle = getResourceBundle(lang);
+    return bundle.getString(key);
+  }
+
+  private PropertyResourceBundle getResourceBundle(String lang) {
     if (lang == null || !supportedLangs.contains(lang))
       lang = "en";
 
     return bundles.get(lang);
-  }
-
-  public String getMessage(String lang, String key) {
-    PropertyResourceBundle bundle = getResourceBundle(lang);
-    return bundle.getString(key);
   }
 }

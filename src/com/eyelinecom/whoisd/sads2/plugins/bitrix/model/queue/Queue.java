@@ -58,6 +58,7 @@ public class Queue {
   @Size(min = 1, max = 65535, message = "Back page length should be from 1 to 65535 characters")
   private String backPage;
 
+  //язык указанный для плагина, используется при доставке сообщений пользователям в различных месенджерах
   @Column(name = "lang", nullable = false, unique = false, length = 7)
   private String language;
 

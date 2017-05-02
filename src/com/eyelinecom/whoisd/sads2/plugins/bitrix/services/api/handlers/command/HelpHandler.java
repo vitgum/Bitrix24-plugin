@@ -38,6 +38,6 @@ public class HelpHandler extends CommonEventHandler implements CommandHandler {
     processIdChatNotJoined(parameters, application);
 
     final String dialogId = ParamsExtractor.getDialogId(parameters);
-    messageDeliveryService.sendMessageToChat(application, dialogId, getLocalizedMessage(parameters,"help.text"));
+    messageDeliveryService.sendMessageToChat(application, dialogId, getLocalizedMessage(application.getLanguage(),"help.text"));
   }
 }

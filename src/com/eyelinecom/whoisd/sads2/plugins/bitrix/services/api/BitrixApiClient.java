@@ -12,6 +12,7 @@ import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.query.ApplicationQ
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.query.ChatQuery;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.query.QueueQuery;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryService;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
@@ -47,7 +48,7 @@ public class BitrixApiClient {
   private final RenewRefreshTokensDaemon renewRefreshTokensDaemon;
   private final ScheduledExecutorService scheduledExecutorService;
   private final Map<String, java.util.Queue<Runnable>> queues = new ConcurrentHashMap<>();
-  private final Map<String, Map<String, String[]>> commands = new HashMap<>(3); // key -> lang
+  private final Map<String, Map<String, String[]>> commands = new HashMap<>(4); // key -> lang
   private static final String ENGLISH = "en";
   private static final String RUSSIAN = "ru";
 
@@ -64,19 +65,31 @@ public class BitrixApiClient {
     this.scheduledExecutorService = scheduledExecutorService;
     scheduledExecutorService.scheduleWithFixedDelay(notificationDaemon, 60L, notificationTimeoutInSeconds, TimeUnit.SECONDS);
     scheduledExecutorService.scheduleWithFixedDelay(renewRefreshTokensDaemon, 1L, 60L, TimeUnit.MINUTES);
+    initCommands();
+  }
 
-    final Map<String, String[]> commands_en = new HashMap<>(3);
-    final Map<String, String[]> commands_ru = new HashMap<>(3);
-    commands_en.put("help", new String[]{"description of the bot", ""});
-    commands_en.put("info", new String[]{"get current count of users", ""});
-    commands_en.put("start", new String[]{"start messaging with next user", ""});
-    commands_en.put("stop", new String[]{"stop messaging with current user", ""});
-    commands_ru.put("help", new String[]{"описание бота", ""});
-    commands_ru.put("info", new String[]{"количество активных пользователей", ""});
-    commands_ru.put("start", new String[]{"начать сеанс общения со следующим пользователем", ""});
-    commands_ru.put("stop", new String[]{"завершить сеанс общения с текущим пользователем", ""});
-    commands.put(ENGLISH, commands_en);
-    commands.put(RUSSIAN, commands_ru);
+  private void initCommands() {
+    final Map<String, String[]> helpCommand = new HashMap<>(2);
+    final Map<String, String[]> infoCommand = new HashMap<>(2);
+    final Map<String, String[]> startCmmand = new HashMap<>(2);
+    final Map<String, String[]> stopCommand = new HashMap<>(2);
+
+    helpCommand.put(ENGLISH, new String[]{"description of the bot", ""});
+    helpCommand.put(RUSSIAN, new String[]{"описание бота", ""});
+
+    infoCommand.put(ENGLISH, new String[]{"get current count of users", ""});
+    infoCommand.put(RUSSIAN, new String[]{"количество активных пользователей", ""});
+
+    startCmmand.put(ENGLISH, new String[]{"start messaging with next user", ""});
+    startCmmand.put(RUSSIAN, new String[]{"начать сеанс общения со следующим пользователем", ""});
+
+    stopCommand.put(ENGLISH, new String[]{"stop messaging with current user", ""});
+    stopCommand.put(RUSSIAN, new String[]{"завершить сеанс общения с текущим пользователем", ""});
+
+    commands.put("help", helpCommand);
+    commands.put("info", infoCommand);
+    commands.put("start", startCmmand);
+    commands.put("stop", stopCommand);
   }
 
   public synchronized int createBot(String domain, String accessToken, String refreshToken) {
@@ -97,23 +110,25 @@ public class BitrixApiClient {
   public void addBotCommands(Application application) {
     Integer botId = application.getBotId();
     String domain = application.getDomain();
-    for (Map.Entry<String, Map<String, String[]>> langAndCommands : commands.entrySet()) {
-      String lang = langAndCommands.getKey();
-      Map<String, String[]> cmdMap = langAndCommands.getValue();
-      for (Map.Entry<String,String[]> e : cmdMap.entrySet()) {
-        String cmdName = e.getKey();
-        String[] value = e.getValue();
-        String cmdDescription = value[0];
-        String paramsDescription = value[1];
+    for (Map.Entry<String, Map<String, String[]>> commandAndLocalizedDescriptions : commands.entrySet()) {
+      String commandName = commandAndLocalizedDescriptions.getKey();
+      Map<String, String[]> localizationMap = commandAndLocalizedDescriptions.getValue();
 
-        executeWithRateLimiting(domain, () -> makeRequest(
-          application.getDomain(),
-          BitrixRequestType.ADD_BOT_COMMAND,
-          application.getAccessToken(),
-          application.getRefreshToken(),
-          requestParamsFactory.getAddCommandJsonParams(botId, lang, cmdName, cmdDescription, paramsDescription))
-        );
-      }
+      String[] ru = localizationMap.get(RUSSIAN);
+      String[] en = localizationMap.get(ENGLISH);
+
+      String englishDescription = en[0];
+      String englishParamsDescription = en[1];
+      String russianDescription = ru[0];
+      String russianParamsDescription = ru[1];
+
+      executeWithRateLimiting(domain, () -> makeRequest(
+        application.getDomain(),
+        BitrixRequestType.ADD_BOT_COMMAND,
+        application.getAccessToken(),
+        application.getRefreshToken(),
+        requestParamsFactory.getAddCommandJsonParams(botId, commandName, englishDescription, englishParamsDescription, russianDescription, russianParamsDescription))
+      );
     }
   }
 
@@ -271,6 +286,7 @@ public class BitrixApiClient {
     private void sendNotifications() {
       DBService db = PluginContext.getInstance().getDBService();
       MessageDeliveryService messageDeliveryService = PluginContext.getInstance().getMessageDeliveryService();
+      ResourceBundleController resourceBundleController = PluginContext.getInstance().getResourceBundleController();
       db.vtx(s -> {
         List<Application> applications = ApplicationQuery.all(s).list();
         for (Application application : applications) {
@@ -283,9 +299,11 @@ public class BitrixApiClient {
           if (awaitingQueue.isEmpty())
             continue;
 
-          String message = "Awaiting users count: " + awaitingQueue.size() + "\nProcessing users count: " + processingQueue.size();
-          List<Chat> chats = ChatQuery.byType(application, Chat.Type.GROUP, s).list();
+          String appLang = application.getLanguage();
+          String message = resourceBundleController.getMessage(appLang,"awaiting.users", awaitingQueue.size() + "") + "\n" +
+            resourceBundleController.getMessage(appLang,"processing.users", processingQueue.size() + "");
 
+          List<Chat> chats = ChatQuery.byType(application, Chat.Type.GROUP, s).list();
           for (Chat chat : chats) {
             messageDeliveryService.sendMessageToChat(application, chat.getDialogId(), message);
           }

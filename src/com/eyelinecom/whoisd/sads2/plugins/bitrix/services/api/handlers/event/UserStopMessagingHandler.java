@@ -54,9 +54,8 @@ public class UserStopMessagingHandler extends CommonEventHandler implements Even
     if (queue == null)
       return;
 
-    final String lang = queue.getLanguage();
     queueController.removeFromQueue(queue.getApplication(), queue.getUser(), queue.getServiceId());
-    messageDeliveryService.sendMessageToOperator(queue.getOperator(), getLocalizedMessage(lang, "user.quit"));
+    messageDeliveryService.sendMessageToOperator(queue.getOperator(), getLocalizedMessage(application.getLanguage(), "user.quit"));
   }
 
   @Override

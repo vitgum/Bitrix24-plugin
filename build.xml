@@ -1,4 +1,4 @@
-<project name="sads-bitrix-plugin" xmlns:ivy="antlib:org.apache.ivy.ant" basedir="." > <!--default="jar"-->
+<project name="bitrix-plugin" xmlns:ivy="antlib:org.apache.ivy.ant" basedir="." >
 
   <property file="build.properties"/>
 
@@ -21,7 +21,6 @@
   <path id="bitrix.compile.classpath">
     <fileset dir="lib" includes="*.jar"/>
     <fileset dir="libdev" includes="*.jar"/>
-    <!--<path path="${bitrix.classes.dir}"/>-->
   </path>
 
   <target name="clean" description="clean all">
@@ -33,11 +32,8 @@
   <target name="resolve" description="retrieve dependencies with ivy">
     <ivy:settings file="${user.home}/.ivy2/ivysettings.xml"/>
     <ivy:resolve transitive="false"/>
-    <!--<mkdir dir="${build.dir}/lib"/>-->
     <ivy:retrieve type="jar,bundle" pattern="${basedir}/lib/[artifact]-[revision].[ext]" conf="bitrix-plugin-prod" haltonfailure="true"/>
     <ivy:retrieve type="jar,bundle" pattern="${basedir}/libdev/[artifact]-[revision].[ext]" conf="bitrix-plugin-dev" haltonfailure="true"/>
-    <!--<mkdir dir="${report.dir}/ivy"/>-->
-    <!--<ivy:report todir="${report.dir}/ivy" graph="true"/>-->
   </target>
 
   <target name="javac" description="Компилирует код с помощью javac">
@@ -60,33 +56,16 @@
   </target>
 
   <target name="distr" depends="compile">
-    <delete file="${distr.dir}/bitrix_plugin.war" failonerror="false"/>
-    <!--<delete file="${distr.dir}/jar/disable-helpdesk-interceptor.jar" failonerror="false"/>-->
+    <delete file="${distr.dir}/${module.name}.war" failonerror="false"/>
     <mkdir dir="${distr.dir}"/>
 
-    <war destfile="${distr.dir}/bitrix_plugin.war" webxml="${basedir}/WEB-INF/web.xml">
+    <war destfile="${distr.dir}/${module.name}.war" webxml="${basedir}/WEB-INF/web.xml">
       <manifest>
         <attribute name="Release-Version" value="${release.version}"/>
       </manifest>
       <classes dir="${bitrix.classes.dir}"/>
       <lib dir="lib"/>
     </war>
-
-    <!--<jar destfile="${distr.dir}/jar/disable-helpdesk-interceptor.jar">-->
-      <!--<manifest>-->
-        <!--<attribute name="Module" value="disable-helpdesk-interceptor"/>-->
-        <!--<attribute name="Vendor" value="Eyeline Communications"/>-->
-        <!--<attribute name="Release-Version" value="${release.version}"/>-->
-        <!--<attribute name="Build-Date" value="${build.date}"/>-->
-      <!--</manifest>-->
-      <!--<fileset dir="${bitrix.classes.dir}" includes="**/*DisableHelpDeskInterceptor*"/>-->
-    <!--</jar>-->
   </target>
-
-  <!--<target name="distr-only-jars" depends="clean, resolve, distr">-->
-    <!--<ivy:publish resolver="${resolver}" pubrevision="${release.version}" overwrite="true">-->
-      <!--<artifacts pattern="${distr.dir}/jar/[artifact].[ext]"/>-->
-    <!--</ivy:publish>-->
-  <!--</target>-->
 
 </project>

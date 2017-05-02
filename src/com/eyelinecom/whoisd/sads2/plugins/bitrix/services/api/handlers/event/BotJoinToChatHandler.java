@@ -41,15 +41,16 @@ public class BotJoinToChatHandler extends CommonEventHandler implements EventHan
 
   private void processChatJoining(Map<String, String[]> parameters, Application application) {
     final Chat.Type chatType = ParamsExtractor.getChatType(parameters);
+    final String appLang = application.getLanguage();
 
     switch (chatType){
       case GROUP:
         Chat chat = getOrCreateChat(parameters, application);
-        messageDeliveryService.sendMessageToChat(application, chat.getDialogId(), getLocalizedMessage(parameters,"welcome"));
+        messageDeliveryService.sendMessageToChat(application, chat.getDialogId(), getLocalizedMessage(appLang,"welcome"));
         break;
       case PRIVATE:
         Operator operator = getOrCreateOperator(parameters, application);
-        messageDeliveryService.sendMessageToChat(application, operator.getDialogId(), getLocalizedMessage(parameters,"welcome"));
+        messageDeliveryService.sendMessageToChat(application, operator.getDialogId(), getLocalizedMessage(appLang,"welcome"));
         break;
     }
   }

@@ -80,23 +80,32 @@ public class RequestParamsFactory {
     }
   }
 
-  public String getAddCommandJsonParams(Integer botId, String lang, String commandName, String commandDescription, String paramsDescription) {
+  public String getAddCommandJsonParams(Integer botId, String commandName,
+                                        String englishDescription, String englishParamsDescription,
+                                        String russianDescription, String russianParamsDescription) {
     try {
       ObjectNode json = mapper.createObjectNode();
 
-      ObjectNode languageProperties = mapper.createObjectNode();
-      languageProperties.put("LANGUAGE_ID", lang);
-      languageProperties.put("TITLE", commandDescription);
-      languageProperties.put("PARAMS", paramsDescription);
-      ObjectNode languageObject = mapper.createObjectNode();
-      languageObject.set(lang, languageProperties);
+      ObjectNode english = mapper.createObjectNode();
+      english.put("LANGUAGE_ID", "en");
+      english.put("TITLE", englishDescription);
+      english.put("PARAMS", englishParamsDescription);
+
+      ObjectNode russian = mapper.createObjectNode();
+      russian.put("LANGUAGE_ID", "ru");
+      russian.put("TITLE", russianDescription);
+      russian.put("PARAMS", russianParamsDescription);
+
+      ObjectNode language = mapper.createObjectNode();
+      language.set("en", english);
+      language.set("ru", russian);
 
       json.put("BOT_ID", botId);
       json.put("COMMAND", commandName);
       json.put("COMMON", NO);
       json.put("HIDDEN", NO);
       json.put("EXTRANET_SUPPORT", NO);
-      json.set("LANG", languageObject);
+      json.set("LANG", language);
       json.put("EVENT_COMMAND_ADD", callbackUrl);
 
       return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);

@@ -45,7 +45,7 @@ public class MessageFromOperatorHandler extends CommonEventHandler implements Ev
     Queue queue = queueController.getProcessingQueue(operator);
 
     if (queue == null) {
-      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(parameters,"user.start.command"));
+      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(application.getLanguage(),"user.start.command"));
     } else {
       final String message = ParamsExtractor.getMessageWithEncoding(parameters);
       messageDeliveryService.sendMessageToUser(queue, message);

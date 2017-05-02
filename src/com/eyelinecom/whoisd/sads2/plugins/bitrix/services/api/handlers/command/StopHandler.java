@@ -37,9 +37,11 @@ public class StopHandler extends CommonEventHandler implements CommandHandler  {
     if (application == null)
       return;
 
+    final String appLang = application.getLanguage();
+
     if (!isPrivateChat(parameters)) {
       final String dialogId = ParamsExtractor.getDialogId(parameters);
-      messageDeliveryService.sendMessageToChat(application, dialogId, getLocalizedMessage(parameters,"only.for.private.chats"));
+      messageDeliveryService.sendMessageToChat(application, dialogId, getLocalizedMessage(appLang,"only.for.private.chats"));
       return;
     }
 
@@ -53,9 +55,9 @@ public class StopHandler extends CommonEventHandler implements CommandHandler  {
       }
       queueController.removeFromQueue(queue.getApplication(), queue.getUser(), queue.getServiceId());
       messageDeliveryService.sendMessageToUser(queue, getLocalizedMessage(queue.getLanguage(),"operator.quit"));
-      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(parameters,"user.flushed")) ;
+      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(appLang,"user.flushed")) ;
     } else {
-      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(parameters,"user.not.flushed"));
+      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(appLang,"user.not.flushed"));
     }
   }
 }

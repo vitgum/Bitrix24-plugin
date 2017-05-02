@@ -74,13 +74,6 @@ public class CommonEventHandler {
   }
 
   protected String getLocalizedMessage(String lang, String key, String ... args) {
-    String template = resourceBundleController.getMessage(lang, key);
-    return args.length > 0 ? String.format(template, args) : template;
-  }
-
-  protected String getLocalizedMessage(Map<String, String[]> parameters, String key, String ... args) {
-    final String lang = ParamsExtractor.getLanguage(parameters);
-    String template = resourceBundleController.getMessage(lang, key);
-    return args.length > 0 ? String.format(template, args) : template;
+    return resourceBundleController.getMessage(lang, key, args);
   }
 }

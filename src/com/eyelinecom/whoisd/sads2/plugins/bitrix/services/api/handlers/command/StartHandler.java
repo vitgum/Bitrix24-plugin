@@ -38,28 +38,30 @@ public class StartHandler extends CommonEventHandler implements CommandHandler {
     if (application == null)
       return;
 
+    final String appLang = application.getLanguage();
+
     if (!isPrivateChat(parameters)) {
       final String dialogId = ParamsExtractor.getDialogId(parameters);
-      messageDeliveryService.sendMessageToChat(application, dialogId, getLocalizedMessage(parameters,"only.for.private.chats"));
+      messageDeliveryService.sendMessageToChat(application, dialogId, getLocalizedMessage(appLang,"only.for.private.chats"));
       return;
     }
 
     Operator operator = getOrCreateOperator(parameters, application);
     if (queueController.isOperatorBusy(operator)) {
-      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(parameters,"already.messaging.with.user"));
+      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(appLang,"already.messaging.with.user"));
       return;
     }
 
     Queue firstAwaiting = queueController.getFirstAwaiting(application);
 
     if (firstAwaiting == null) {
-      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(parameters,"no.users"));
+      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(appLang,"no.users"));
     } else {
       Integer queueId = firstAwaiting.getId();
       queueController.moveToProcessingQueue(queueId, operator);
 
       String userMessages = queueController.getMessages(queueId);
-      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(parameters, "message.from", firstAwaiting.getProtocol()) + "\n" + userMessages);
+      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(appLang, "message.from", firstAwaiting.getProtocol()) + "\n" + userMessages);
 
       queueController.deleteMessages(queueId);
 

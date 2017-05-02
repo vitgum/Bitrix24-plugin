@@ -16,7 +16,6 @@ public class ApplicationQuery {
     c.setCacheable(true);
     c.setCacheRegion("applications");
     c.setCacheMode(CacheMode.NORMAL);
-    c.add(Restrictions.ne("deleted", true));
     return c;
   }
 
