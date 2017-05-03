@@ -16,6 +16,7 @@ class ApplicationTest extends DBTestBase {
       accessToken : 'TOKEN',
       refreshToken : 'TOKEN',
       botId : 56,
+      language: "ru",
       deleted : false
     ]
     return new Application(defaultFields + overrides)
@@ -38,24 +39,18 @@ class ApplicationTest extends DBTestBase {
 
   void testDuplicate() {
     def app = createCorrectApplication()
-    def same = createCorrectApplication()
-    def deleted = createCorrectApplication(deleted: true)
+    def deleted1 = createCorrectApplication(deleted: true)
+    def deleted2 = createCorrectApplication(deleted: true)
 
     vtx { s ->
-      s.save(deleted)
+      s.save(deleted1)
+      s.save(deleted2)
       s.save(app)
     }
 
-    assertNotNull(deleted.id)
+    assertNotNull(deleted1.id)
+    assertNotNull(deleted2.id)
     assertNotNull(app.id)
-
-    def msg = shouldFail(ConstraintViolationException) {
-      vtx { s ->
-        s.save(same)
-      }
-    }
-
-    assertEquals 'could not execute statement', msg
   }
 
   static void assertApplicationsEquals(Application expected, Application actual) {
@@ -64,5 +59,6 @@ class ApplicationTest extends DBTestBase {
     assertEquals expected.refreshToken, actual.refreshToken
     assertEquals expected.botId, actual.botId
     assertEquals expected.deleted, actual.deleted
+    assertEquals expected.language, actual.language
   }
 }

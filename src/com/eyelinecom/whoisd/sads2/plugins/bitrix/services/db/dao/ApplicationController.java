@@ -44,7 +44,8 @@ public class ApplicationController {
   public void delete(Integer id) {
     db.vtx(s -> {
       Application application = (Application) ApplicationQuery.byId(id, s).uniqueResult();
-      s.delete(application);
+      application.setDeleted(true);
+      s.save(application);
     });
   }
 }

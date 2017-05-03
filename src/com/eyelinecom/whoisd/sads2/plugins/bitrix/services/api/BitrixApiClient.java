@@ -25,6 +25,10 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,19 +57,36 @@ public class BitrixApiClient {
   private static final String RUSSIAN = "ru";
 
   public BitrixApiClient(ScheduledExecutorService scheduledExecutorService, String appId, String appSecret, String appCode,
-                         String callbackUrl, String botName, int connectTimeout, int requestTimeout, long notificationTimeoutInSeconds) {
+                         String callbackUrl, String botName, String botAvatarPath, int connectTimeout, int requestTimeout, long notificationTimeoutInSeconds) {
     ClientConfig config = new ClientConfig();
     config.property(ClientProperties.CONNECT_TIMEOUT, connectTimeout);
     config.property(ClientProperties.READ_TIMEOUT, requestTimeout);
     config.property(ClientProperties.USE_ENCODING, "UTF-8");
     this.client = ClientBuilder.newBuilder().withConfig(config).build();
-    this.requestParamsFactory = new RequestParamsFactory(botName, appId, appSecret, appCode, callbackUrl);
+
+    String botPhotoInBase64 = readBotAvatar(botAvatarPath);
+    this.requestParamsFactory = new RequestParamsFactory(botName, botPhotoInBase64, appId, appSecret, appCode, callbackUrl);
+
     this.notificationDaemon = new NotificationDaemon();
     this.renewRefreshTokensDaemon = new RenewRefreshTokensDaemon();
     this.scheduledExecutorService = scheduledExecutorService;
     scheduledExecutorService.scheduleWithFixedDelay(notificationDaemon, 60L, notificationTimeoutInSeconds, TimeUnit.SECONDS);
     scheduledExecutorService.scheduleWithFixedDelay(renewRefreshTokensDaemon, 1L, 60L, TimeUnit.MINUTES);
+
     initCommands();
+  }
+
+  private String readBotAvatar(String path) {
+    File originalFile = new File(path);
+    try {
+      FileInputStream fileInputStreamReader = new FileInputStream(originalFile);
+      byte[] bytes = new byte[(int)originalFile.length()];
+      fileInputStreamReader.read(bytes);
+      return Base64.getEncoder().encodeToString(bytes);
+    } catch (IOException e) {
+      logger.error("Can't read bot avatar", e);
+    }
+    return "";
   }
 
   private void initCommands() {

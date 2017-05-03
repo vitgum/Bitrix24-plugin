@@ -16,14 +16,16 @@ public class RequestParamsFactory {
 
   private final ObjectMapper mapper;
   private final String botName;
+  private final String botPhotoInBase64;
   private final String appId;
   private final String appSecret;
   private final String appCode;
   private final String callbackUrl;
 
-  public RequestParamsFactory(String botName, String appId, String appSecret, String appCode, String callbackUrl) {
+  public RequestParamsFactory(String botName, String botPhotoInBase64, String appId, String appSecret, String appCode, String callbackUrl) {
     this.mapper = new ObjectMapper();
     this.botName = botName;
+    this.botPhotoInBase64 = botPhotoInBase64;
     this.appId = appId;
     this.appSecret = appSecret;
     this.appCode = appCode;
@@ -34,8 +36,8 @@ public class RequestParamsFactory {
     try {
       ObjectNode json = mapper.createObjectNode();
       ObjectNode botProperties = mapper.createObjectNode();
-
       botProperties.put("NAME", botName);
+      botProperties.put("PERSONAL_PHOTO", botPhotoInBase64);
       json.put("CODE", appCode);
       json.put("EVENT_MESSAGE_ADD", callbackUrl);
       json.put("EVENT_WELCOME_MESSAGE", callbackUrl);

@@ -62,8 +62,9 @@ public class Services {
       int connectTimeout = apiClientSection.getInt("bitrix.api.client.connectTimeout.millis");
       int requestTimeout = apiClientSection.getInt("bitrix.api.client.requestTimeout.millis");
       String botName = apiClientSection.getString("bitrix.api.client.bot.name");
+      String botAvatarPath = apiClientSection.getString("bitrix.api.client.bot.avatar.path");
       long notificationTimeoutInSeconds = apiClientSection.getLong("bitrix.api.client.notification.timeout.seconds");
-      return new BitrixApiClient(scheduledExecutorService, appId, appSecret, appCode, callbackUrl, botName, connectTimeout, requestTimeout, notificationTimeoutInSeconds);
+      return new BitrixApiClient(scheduledExecutorService, appId, appSecret, appCode, callbackUrl, botName, botAvatarPath, connectTimeout, requestTimeout, notificationTimeoutInSeconds);
     }
     catch(ConfigException e) {
       throw new ServicesException("Error during BitrixApiClient initialization.", e);

@@ -12,6 +12,7 @@
     <param name="bitrix.api.client.app.secret">CLIENT_APP_SECRET</param>
     <param name="bitrix.api.client.app.code">company.chatbot</param>
     <param name="bitrix.api.client.bot.name">Miniapps Bot</param>
+    <param name="bitrix.api.client.bot.avatar.path">/home/voronov/projects/sads2/content/bitrix/conf/miniapps_logo.jpg</param>
     <param name="bitrix.api.client.notification.timeout.seconds">30</param>
   </section>
 

@@ -18,7 +18,7 @@ public class Application {
   @Column(name = "id")
   private Integer id;
 
-  @Column(name = "domain", nullable = false, unique = true, length = 255)
+  @Column(name = "domain", nullable = false, unique = false, length = 255)
   private String domain;
 
   @Column(name = "access_token", nullable = false, unique = false)
@@ -33,6 +33,9 @@ public class Application {
   //язык установки Битрикс, используется при доставке сообщений операторам
   @Column(name = "lang", nullable = false, unique = false, length = 7)
   private String language;
+
+  @Column(name="deleted", nullable = false, unique = false)
+  private boolean deleted;
 
   @CreationTimestamp
   @Column(name="create_date", unique = false, nullable = false)
@@ -84,6 +87,14 @@ public class Application {
 
   public void setLanguage(String language) {
     this.language = language;
+  }
+
+  public boolean isDeleted() {
+    return deleted;
+  }
+
+  public void setDeleted(boolean deleted) {
+    this.deleted = deleted;
   }
 
   public Date getCreateDate() {

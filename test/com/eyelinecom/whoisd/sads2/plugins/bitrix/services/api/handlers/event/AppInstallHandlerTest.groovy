@@ -3,10 +3,12 @@ package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.event
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.DBTestBase
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiClient
 import groovy.mock.interceptor.MockFor
+import org.junit.Ignore
 
 /**
  * author: Artem Voronov
  */
+@Ignore
 class AppInstallHandlerTest extends DBTestBase{
 
   void testAppInstallEvent() {
