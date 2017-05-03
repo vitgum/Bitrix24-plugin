@@ -2,10 +2,10 @@ package com.eyelinecom.whoisd.sads2.plugins.bitrix;
 
 import com.eyeline.utils.config.xml.XmlConfig;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.Services;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiClient;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiProvider;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.DBService;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.*;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryService;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 
 import javax.ws.rs.Produces;
@@ -74,13 +74,13 @@ public class PluginContext {
   }
 
   @Produces
-  public BitrixApiClient getBitrixApiClient() {
-    return services.getBitrixApiClient();
+  public BitrixApiProvider getBitrixApiProvider() {
+    return services.getBitrixApiProvider();
   }
 
   @Produces
-  public MessageDeliveryService getMessageDeliveryService() {
-    return services.getMessageDeliveryService();
+  public MessageDeliveryProvider getMessageDeliveryProvider() {
+    return services.getMessageDeliveryProvider();
   }
 
   @Produces

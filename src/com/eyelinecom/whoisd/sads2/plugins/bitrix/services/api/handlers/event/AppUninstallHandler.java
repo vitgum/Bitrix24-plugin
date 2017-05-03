@@ -1,9 +1,7 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.event;
 
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.PluginContext;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.Services;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiClient;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiProvider;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.EventHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ApplicationController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor;
@@ -19,12 +17,11 @@ public class AppUninstallHandler implements EventHandler {
   private final static Logger logger = Logger.getLogger("BITRIX_PLUGIN");
 
   private final ApplicationController applicationController;
-  private final BitrixApiClient api;
+  private final BitrixApiProvider api;
 
-  public AppUninstallHandler() {
-    Services services = PluginContext.getInstance().getServices();
-    this.applicationController = services.getApplicationController();
-    this.api = services.getBitrixApiClient();
+  public AppUninstallHandler(ApplicationController applicationController, BitrixApiProvider api) {
+    this.applicationController = applicationController;
+    this.api = api;
   }
 
   @Override

@@ -16,7 +16,6 @@ public class ApplicationQuery {
     c.setCacheable(true);
     c.setCacheRegion("applications");
     c.setCacheMode(CacheMode.NORMAL);
-    c.add(Restrictions.ne("deleted", true));
     return c;
   }
 
@@ -24,8 +23,12 @@ public class ApplicationQuery {
     return all(s).add(Restrictions.idEq(id));
   }
 
+  public static Criteria active(Session s) {
+    return all(s).add(Restrictions.ne("deleted", true));
+  }
+
   public static Criteria byDomain(String domain, Session s) {
-    return all(s).add(Restrictions.eq("domain", domain));
+    return active(s).add(Restrictions.eq("domain", domain));
   }
 
 }

@@ -1,15 +1,17 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.command;
 
 
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.PluginContext;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.operator.Operator;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.queue.Queue;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.Services;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.CommandHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.CommonEventHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ApplicationController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ChatController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.OperatorController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.QueueController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor;
 import org.apache.log4j.Logger;
 
@@ -23,10 +25,10 @@ public class StopHandler extends CommonEventHandler implements CommandHandler  {
   private final ApplicationController applicationController;
   private final QueueController queueController;
 
-  public StopHandler() {
-    Services services = PluginContext.getInstance().getServices();
-    this.applicationController = services.getApplicationController();
-    this.queueController = services.getQueueController();
+  public StopHandler(ChatController chatController, OperatorController operatorController, MessageDeliveryProvider messageDeliveryProvider, ResourceBundleController resourceBundleController, ApplicationController applicationController, QueueController queueController) {
+    super(chatController, operatorController, messageDeliveryProvider, resourceBundleController);
+    this.applicationController = applicationController;
+    this.queueController = queueController;
   }
 
   @Override
@@ -41,7 +43,7 @@ public class StopHandler extends CommonEventHandler implements CommandHandler  {
 
     if (!isPrivateChat(parameters)) {
       final String dialogId = ParamsExtractor.getDialogId(parameters);
-      messageDeliveryService.sendMessageToChat(application, dialogId, getLocalizedMessage(appLang,"only.for.private.chats"));
+      messageDeliveryProvider.sendMessageToChat(application, dialogId, getLocalizedMessage(appLang,"only.for.private.chats"));
       return;
     }
 
@@ -54,10 +56,10 @@ public class StopHandler extends CommonEventHandler implements CommandHandler  {
         logger.debug("Operator stop messaging. Application domain: " + domain + ". Operator ID: " + operator.getId() + ". Operator name: " + operatorFullName + ". User ID: " + queue.getUser().getUserId() + ". Service ID: " + queue.getServiceId());
       }
       queueController.removeFromQueue(queue.getApplication(), queue.getUser(), queue.getServiceId());
-      messageDeliveryService.sendMessageToUser(queue, getLocalizedMessage(queue.getLanguage(),"operator.quit"));
-      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(appLang,"user.flushed")) ;
+      messageDeliveryProvider.sendMessageToUser(queue, getLocalizedMessage(queue.getLanguage(),"operator.quit"));
+      messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang,"user.flushed")) ;
     } else {
-      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(appLang,"user.not.flushed"));
+      messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang,"user.not.flushed"));
     }
   }
 }

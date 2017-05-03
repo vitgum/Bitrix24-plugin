@@ -5,8 +5,10 @@ import com.eyeline.utils.config.ConfigException;
 import com.eyeline.utils.config.xml.XmlConfig;
 import com.eyeline.utils.config.xml.XmlConfigSection;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiClient;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiProvider;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.DBService;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.*;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryService;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 
@@ -19,11 +21,11 @@ public class Services {
 
   private final DBService dbService;
   private final ScheduledExecutorService scheduledExecutorService;
-  private final BitrixApiClient bitrixApiClient;
+  private final BitrixApiProvider bitrixApiProvider;
   private final ApplicationController applicationController;
   private final UserController userController;
   private final QueueController queueController;
-  private final MessageDeliveryService messageDeliveryService;
+  private final MessageDeliveryProvider messageDeliveryProvider;
   private final ChatController chatController;
   private final OperatorController operatorController;
   private final ResourceBundleController resourceBundleController;
@@ -31,8 +33,8 @@ public class Services {
   public Services(XmlConfig config) throws ServicesException {
     this.dbService = initDBService(config);
     this.scheduledExecutorService = initScheduledExecutorService(config);
-    this.messageDeliveryService = new MessageDeliveryService();
-    this.bitrixApiClient = initBitrixApiClient(config, scheduledExecutorService);
+    this.messageDeliveryProvider = new MessageDeliveryService();
+    this.bitrixApiProvider = initBitrixApiClient(config, scheduledExecutorService);
     this.applicationController = new ApplicationController(dbService);
     this.userController = new UserController(dbService);
     this.queueController = new QueueController(dbService);
@@ -92,12 +94,12 @@ public class Services {
     return dbService;
   }
 
-  public BitrixApiClient getBitrixApiClient() {
-    return bitrixApiClient;
+  public BitrixApiProvider getBitrixApiProvider() {
+    return bitrixApiProvider;
   }
 
-  public MessageDeliveryService getMessageDeliveryService() {
-    return messageDeliveryService;
+  public MessageDeliveryProvider getMessageDeliveryProvider() {
+    return messageDeliveryProvider;
   }
 
   public ApplicationController getApplicationController() {

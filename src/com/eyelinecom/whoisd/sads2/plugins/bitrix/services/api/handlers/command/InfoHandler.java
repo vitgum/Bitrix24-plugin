@@ -1,14 +1,12 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.command;
 
 
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.PluginContext;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.Services;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.CommandHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.CommonEventHandler;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ApplicationController;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.QueueController;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.UserCounters;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.*;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor;
 import org.apache.log4j.Logger;
 
@@ -22,10 +20,10 @@ public class InfoHandler extends CommonEventHandler implements CommandHandler {
   private final ApplicationController applicationController;
   private final QueueController queueController;
 
-  public InfoHandler() {
-    Services services = PluginContext.getInstance().getServices();
-    this.applicationController = services.getApplicationController();
-    this.queueController = services.getQueueController();
+  public InfoHandler(ChatController chatController, OperatorController operatorController, MessageDeliveryProvider messageDeliveryProvider, ResourceBundleController resourceBundleController, ApplicationController applicationController, QueueController queueController) {
+    super(chatController, operatorController, messageDeliveryProvider, resourceBundleController);
+    this.applicationController = applicationController;
+    this.queueController = queueController;
   }
 
   @Override
@@ -46,11 +44,11 @@ public class InfoHandler extends CommonEventHandler implements CommandHandler {
     final String appLang = application.getLanguage();
 
     if (!counters.hasAwaitingUsers()) {
-      messageDeliveryService.sendMessageToChat(application, dialogId, getLocalizedMessage(appLang, "no.users"));
+      messageDeliveryProvider.sendMessageToChat(application, dialogId, getLocalizedMessage(appLang, "no.users"));
       return;
     }
     String notification = getLocalizedMessage(appLang,"awaiting.users", counters.getAwaitingUsersCount() + "") + "\n" +
       getLocalizedMessage(appLang,"processing.users", counters.getProcessingUsersCount() + "");
-    messageDeliveryService.sendMessageToChat(application, dialogId, notification);
+    messageDeliveryProvider.sendMessageToChat(application, dialogId, notification);
   }
 }

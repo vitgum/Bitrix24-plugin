@@ -1,13 +1,13 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.event;
 
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.PluginContext;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.queue.Queue;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.user.User;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.Services;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.CommonEventHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.EventHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.*;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.EncodingUtils;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.PrettyPrintUtils;
@@ -30,11 +30,11 @@ public class UserStopMessagingHandler extends CommonEventHandler implements Even
   private final QueueController queueController;
   private final UserController userController ;
 
-  public UserStopMessagingHandler() {
-    Services services = PluginContext.getInstance().getServices();
-    this.applicationController = services.getApplicationController();
-    this.queueController = services.getQueueController();
-    this.userController = services.getUserController();
+  public UserStopMessagingHandler(ChatController chatController, OperatorController operatorController, MessageDeliveryProvider messageDeliveryProvider, ResourceBundleController resourceBundleController, ApplicationController applicationController, QueueController queueController, UserController userController) {
+    super(chatController, operatorController, messageDeliveryProvider, resourceBundleController);
+    this.applicationController = applicationController;
+    this.queueController = queueController;
+    this.userController = userController;
   }
 
   @Override
@@ -55,7 +55,7 @@ public class UserStopMessagingHandler extends CommonEventHandler implements Even
       return;
 
     queueController.removeFromQueue(queue.getApplication(), queue.getUser(), queue.getServiceId());
-    messageDeliveryService.sendMessageToOperator(queue.getOperator(), getLocalizedMessage(application.getLanguage(), "user.quit"));
+    messageDeliveryProvider.sendMessageToOperator(queue.getOperator(), getLocalizedMessage(application.getLanguage(), "user.quit"));
   }
 
   @Override

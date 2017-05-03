@@ -6,7 +6,7 @@ import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.chat.Chat;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.operator.Operator;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.queue.Queue;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.user.User;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiClient;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiProvider;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ChatController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.EncodingUtils;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.TemplateUtils;
@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * author: Artem Voronov
  */
-public class MessageDeliveryService {
+public class MessageDeliveryService implements MessageDeliveryProvider {
 
   private static final Logger logger = Logger.getLogger("BITRIX_PLUGIN");
   private static final Logger loggerMessagingSads = Logger.getLogger("BITRIX_PLUGIN_MESSAGING_WITH_SADS");
@@ -55,7 +55,7 @@ public class MessageDeliveryService {
   }
 
   private static void pushMessageToBitrix(Application application, String dialogId, String message) {
-    BitrixApiClient api = PluginContext.getInstance().getBitrixApiClient();
+    BitrixApiProvider api = PluginContext.getInstance().getBitrixApiProvider();
     api.sendMessage(application, dialogId, message);
   }
 

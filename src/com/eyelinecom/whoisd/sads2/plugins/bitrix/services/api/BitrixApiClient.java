@@ -11,7 +11,7 @@ import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ApplicationCon
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.query.ApplicationQuery;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.query.ChatQuery;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.query.QueueQuery;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryService;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 /**
  * author: Artem Voronov
  */
-public class BitrixApiClient {
+public class BitrixApiClient implements BitrixApiProvider {
   private static final Logger logger = Logger.getLogger("BITRIX_API_CLIENT");
   private static final Logger loggerRateLimiting = Logger.getLogger("BITRIX_API_CLIENT_RATE_LIMITING");
   private static final ObjectMapper mapper = new ObjectMapper();
@@ -306,7 +306,7 @@ public class BitrixApiClient {
 
     private void sendNotifications() {
       DBService db = PluginContext.getInstance().getDBService();
-      MessageDeliveryService messageDeliveryService = PluginContext.getInstance().getMessageDeliveryService();
+      MessageDeliveryProvider messageDeliveryProvider = PluginContext.getInstance().getMessageDeliveryProvider();
       ResourceBundleController resourceBundleController = PluginContext.getInstance().getResourceBundleController();
       db.vtx(s -> {
         List<Application> applications = ApplicationQuery.all(s).list();
@@ -326,7 +326,7 @@ public class BitrixApiClient {
 
           List<Chat> chats = ChatQuery.byType(application, Chat.Type.GROUP, s).list();
           for (Chat chat : chats) {
-            messageDeliveryService.sendMessageToChat(application, chat.getDialogId(), message);
+            messageDeliveryProvider.sendMessageToChat(application, chat.getDialogId(), message);
           }
         }
       });

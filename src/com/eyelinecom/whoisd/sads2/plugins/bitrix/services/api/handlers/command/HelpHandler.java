@@ -1,12 +1,14 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.command;
 
 
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.PluginContext;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.Services;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.CommandHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.CommonEventHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ApplicationController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ChatController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.OperatorController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor;
 import org.apache.log4j.Logger;
 
@@ -19,9 +21,9 @@ public class HelpHandler extends CommonEventHandler implements CommandHandler {
   private static final Logger logger = Logger.getLogger("BITRIX_PLUGIN");
   private final ApplicationController applicationController;
 
-  public HelpHandler() {
-    Services services = PluginContext.getInstance().getServices();
-    this.applicationController = services.getApplicationController();
+  public HelpHandler(ChatController chatController, OperatorController operatorController, MessageDeliveryProvider messageDeliveryProvider, ResourceBundleController resourceBundleController, ApplicationController applicationController) {
+    super(chatController, operatorController, messageDeliveryProvider, resourceBundleController);
+    this.applicationController = applicationController;
   }
 
   @Override
@@ -38,6 +40,6 @@ public class HelpHandler extends CommonEventHandler implements CommandHandler {
     processIdChatNotJoined(parameters, application);
 
     final String dialogId = ParamsExtractor.getDialogId(parameters);
-    messageDeliveryService.sendMessageToChat(application, dialogId, getLocalizedMessage(application.getLanguage(),"help.text"));
+    messageDeliveryProvider.sendMessageToChat(application, dialogId, getLocalizedMessage(application.getLanguage(),"help.text"));
   }
 }

@@ -1,14 +1,16 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.event;
 
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.PluginContext;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.operator.Operator;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.queue.Queue;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.Services;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.EventHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.CommonEventHandler;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.EventHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ApplicationController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ChatController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.OperatorController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.QueueController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor;
 
 import java.util.Map;
@@ -20,10 +22,10 @@ public class MessageFromOperatorHandler extends CommonEventHandler implements Ev
   private final ApplicationController applicationController;
   private final QueueController queueController;
 
-  public MessageFromOperatorHandler() {
-    Services services = PluginContext.getInstance().getServices();
-    this.applicationController = services.getApplicationController();
-    this.queueController = services.getQueueController();
+  public MessageFromOperatorHandler(ChatController chatController, OperatorController operatorController, MessageDeliveryProvider messageDeliveryProvider, ResourceBundleController resourceBundleController, ApplicationController applicationController, QueueController queueController) {
+    super(chatController, operatorController, messageDeliveryProvider, resourceBundleController);
+    this.applicationController = applicationController;
+    this.queueController = queueController;
   }
 
   @Override
@@ -37,18 +39,14 @@ public class MessageFromOperatorHandler extends CommonEventHandler implements Ev
     if (!isPrivateChat(parameters))
       return;
 
-    Operator operator = operatorController.find(application, ParamsExtractor.getOperatorId(parameters));
-
-    if (operator == null)
-     operator = getOrCreateOperator(parameters, application);
-
+    Operator operator = getOrCreateOperator(parameters, application);
     Queue queue = queueController.getProcessingQueue(operator);
 
     if (queue == null) {
-      messageDeliveryService.sendMessageToOperator(operator, getLocalizedMessage(application.getLanguage(),"user.start.command"));
+      messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(application.getLanguage(),"user.start.command"));
     } else {
       final String message = ParamsExtractor.getMessageWithEncoding(parameters);
-      messageDeliveryService.sendMessageToUser(queue, message);
+      messageDeliveryProvider.sendMessageToUser(queue, message);
     }
   }
 

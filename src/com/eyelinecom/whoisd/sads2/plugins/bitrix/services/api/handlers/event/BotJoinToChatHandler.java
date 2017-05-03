@@ -1,13 +1,15 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.event;
 
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.PluginContext;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.chat.Chat;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.operator.Operator;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.Services;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.CommonEventHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.EventHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ApplicationController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ChatController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.OperatorController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor;
 import org.apache.log4j.Logger;
 
@@ -20,9 +22,9 @@ public class BotJoinToChatHandler extends CommonEventHandler implements EventHan
   private final static Logger logger = Logger.getLogger("BITRIX_PLUGIN");
   private final ApplicationController applicationController;
 
-  public BotJoinToChatHandler() {
-    Services services = PluginContext.getInstance().getServices();
-    this.applicationController = services.getApplicationController();
+  public BotJoinToChatHandler(ChatController chatController, OperatorController operatorController, MessageDeliveryProvider messageDeliveryProvider, ResourceBundleController resourceBundleController, ApplicationController applicationController) {
+    super(chatController, operatorController, messageDeliveryProvider, resourceBundleController);
+    this.applicationController = applicationController;
   }
 
   @Override
@@ -46,11 +48,11 @@ public class BotJoinToChatHandler extends CommonEventHandler implements EventHan
     switch (chatType){
       case GROUP:
         Chat chat = getOrCreateChat(parameters, application);
-        messageDeliveryService.sendMessageToChat(application, chat.getDialogId(), getLocalizedMessage(appLang,"welcome"));
+        messageDeliveryProvider.sendMessageToChat(application, chat.getDialogId(), getLocalizedMessage(appLang,"welcome"));
         break;
       case PRIVATE:
         Operator operator = getOrCreateOperator(parameters, application);
-        messageDeliveryService.sendMessageToChat(application, operator.getDialogId(), getLocalizedMessage(appLang,"welcome"));
+        messageDeliveryProvider.sendMessageToChat(application, operator.getDialogId(), getLocalizedMessage(appLang,"welcome"));
         break;
     }
   }

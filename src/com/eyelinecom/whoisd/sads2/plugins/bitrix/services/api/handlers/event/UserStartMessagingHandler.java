@@ -2,10 +2,13 @@ package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.event;
 
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.PluginContext;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.Services;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.CommonEventHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.EventHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ApplicationController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ChatController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.OperatorController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.EncodingUtils;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.TemplateUtils;
@@ -27,9 +30,9 @@ public class UserStartMessagingHandler extends CommonEventHandler implements Eve
 
   private final ApplicationController applicationController;
 
-  public UserStartMessagingHandler() {
-    Services services = PluginContext.getInstance().getServices();
-    this.applicationController = services.getApplicationController();
+  public UserStartMessagingHandler(ChatController chatController, OperatorController operatorController, MessageDeliveryProvider messageDeliveryProvider, ResourceBundleController resourceBundleController, ApplicationController applicationController) {
+    super(chatController, operatorController, messageDeliveryProvider, resourceBundleController);
+    this.applicationController = applicationController;
   }
 
   @Override

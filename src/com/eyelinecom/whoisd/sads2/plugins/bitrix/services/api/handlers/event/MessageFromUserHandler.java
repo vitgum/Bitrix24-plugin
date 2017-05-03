@@ -1,18 +1,18 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.event;
 
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.PluginContext;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.operator.Operator;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.queue.Queue;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.queue.QueueType;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.user.User;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.Services;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.CommonEventHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.EventHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.*;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.TemplateUtils;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.PrettyPrintUtils;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.TemplateUtils;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletResponse;
@@ -31,11 +31,11 @@ public class MessageFromUserHandler extends CommonEventHandler implements EventH
   private final QueueController queueController;
   private final UserController userController ;
 
-  public MessageFromUserHandler() {
-    Services services = PluginContext.getInstance().getServices();
-    this.applicationController = services.getApplicationController();
-    this.queueController = services.getQueueController();
-    this.userController = services.getUserController();
+  public MessageFromUserHandler(ChatController chatController, OperatorController operatorController, MessageDeliveryProvider messageDeliveryProvider, ResourceBundleController resourceBundleController, ApplicationController applicationController, QueueController queueController, UserController userController) {
+    super(chatController, operatorController, messageDeliveryProvider, resourceBundleController);
+    this.applicationController = applicationController;
+    this.queueController = queueController;
+    this.userController = userController;
   }
 
   @Override
@@ -60,7 +60,7 @@ public class MessageFromUserHandler extends CommonEventHandler implements EventH
     }
     else {
       Operator operator = queueController.getOperator(application, user, serviceId);
-      messageDeliveryService.sendMessageToOperator(operator, message);
+      messageDeliveryProvider.sendMessageToOperator(operator, message);
     }
   }
 
@@ -87,7 +87,7 @@ public class MessageFromUserHandler extends CommonEventHandler implements EventH
       getLocalizedMessage(appLang,"awaiting.users", counters.getAwaitingUsersCount() + "") + "\n" +
       getLocalizedMessage(appLang,"processing.users", counters.getProcessingUsersCount() + "");
 
-    messageDeliveryService.sendMessageToAllChats(application, notification);
+    messageDeliveryProvider.sendMessageToAllChats(application, notification);
   }
 
 

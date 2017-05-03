@@ -1,13 +1,11 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers;
 
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.PluginContext;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.chat.Chat;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.operator.Operator;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.Services;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ChatController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.OperatorController;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryService;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor;
 
@@ -19,15 +17,14 @@ import java.util.Map;
 public class CommonEventHandler {
   protected final ChatController chatController;
   protected final OperatorController operatorController;
-  protected final MessageDeliveryService messageDeliveryService;
+  protected final MessageDeliveryProvider messageDeliveryProvider;
   protected final ResourceBundleController resourceBundleController;
 
-  public CommonEventHandler() {
-    Services services = PluginContext.getInstance().getServices();
-    this.chatController = services.getChatController();
-    this.operatorController = services.getOperatorController();
-    this.messageDeliveryService = services.getMessageDeliveryService();
-    this.resourceBundleController = services.getResourceBundleController();
+  public CommonEventHandler(ChatController chatController, OperatorController operatorController, MessageDeliveryProvider messageDeliveryProvider, ResourceBundleController resourceBundleController) {
+    this.chatController = chatController;
+    this.operatorController = operatorController;
+    this.messageDeliveryProvider = messageDeliveryProvider;
+    this.resourceBundleController = resourceBundleController;
   }
 
   protected Operator getOrCreateOperator(Map<String, String[]> parameters, Application application) {
