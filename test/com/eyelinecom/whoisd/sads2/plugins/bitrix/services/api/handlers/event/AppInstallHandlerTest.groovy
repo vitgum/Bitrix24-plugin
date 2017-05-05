@@ -2,16 +2,15 @@ package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.event
 
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.DBTestBase
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.ApplicationTest
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiProvider
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.Examples
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.DBService
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.InitHelper
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ApplicationController
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.query.ApplicationQuery
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor
 import groovy.mock.interceptor.MockFor
 import org.hibernate.Session
 
+import static com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.EventParametersExamples.APP_INSTALL
 import static org.junit.Assert.assertNotNull
 
 /**
@@ -19,18 +18,6 @@ import static org.junit.Assert.assertNotNull
  */
 
 class AppInstallHandlerTest extends DBTestBase {
-
-  static Application preInstallApplication(DBService dbService) {
-    String domain = ParamsExtractor.getDomain(Examples.EVENT_APP_INSTALL_PARAMETERS)
-    String language = ParamsExtractor.getLanguage(Examples.EVENT_APP_INSTALL_PARAMETERS)
-    String refreshToken = ParamsExtractor.getRefreshToken(Examples.EVENT_APP_INSTALL_PARAMETERS)
-    String accessToken = ParamsExtractor.getAccessToken(Examples.EVENT_APP_INSTALL_PARAMETERS)
-    def application = ApplicationTest.createCorrectApplication(domain: domain, language: language, refreshToken: refreshToken, accessToken: accessToken)
-
-    dbService.tx { s -> s.save(application) }
-
-    return application
-  }
 
   protected AppInstallHandler createAppInstallHandler(BitrixApiProvider bitrixApiProvider) {
     ApplicationController applicationController = new ApplicationController(db)
@@ -53,16 +40,16 @@ class AppInstallHandlerTest extends DBTestBase {
 
     //act
     AppInstallHandler appInstallHandler = createAppInstallHandler(bitrixApiProviderDelegate)
-    appInstallHandler.processEvent(Examples.EVENT_APP_INSTALL_PARAMETERS)
+    appInstallHandler.processEvent(APP_INSTALL)
 
 
     //verify
     bitrixApiProviderMock.verify(bitrixApiProviderDelegate)
     vtx { Session s ->
-      String domain = ParamsExtractor.getDomain(Examples.EVENT_APP_INSTALL_PARAMETERS)
-      String language = ParamsExtractor.getLanguage(Examples.EVENT_APP_INSTALL_PARAMETERS)
-      String refreshToken = ParamsExtractor.getRefreshToken(Examples.EVENT_APP_INSTALL_PARAMETERS)
-      String accessToken = ParamsExtractor.getAccessToken(Examples.EVENT_APP_INSTALL_PARAMETERS)
+      String domain = ParamsExtractor.getDomain(APP_INSTALL)
+      String language = ParamsExtractor.getLanguage(APP_INSTALL)
+      String refreshToken = ParamsExtractor.getRefreshToken(APP_INSTALL)
+      String accessToken = ParamsExtractor.getAccessToken(APP_INSTALL)
       Application application = ApplicationQuery.byDomain(domain, s).uniqueResult() as Application
 
       assertNotNull application
@@ -85,7 +72,7 @@ class AppInstallHandlerTest extends DBTestBase {
      */
   void testReinstallEvent() {
     //init
-    Application application = preInstallApplication()
+    Application application = InitHelper.preInstallApplication(db)
     MockFor bitrixApiProviderMock = new MockFor(BitrixApiProvider)
     bitrixApiProviderMock.demand.deleteBot(1) { Application app -> }
     bitrixApiProviderMock.demand.createBot(1) { String d, String a, String r -> 666}
@@ -95,7 +82,7 @@ class AppInstallHandlerTest extends DBTestBase {
 
     //act
     AppInstallHandler appInstallHandler = createAppInstallHandler(bitrixApiProdiverDelegate)
-    appInstallHandler.processEvent(Examples.EVENT_APP_INSTALL_PARAMETERS)
+    appInstallHandler.processEvent(APP_INSTALL)
 
 
     //verify

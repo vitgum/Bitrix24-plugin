@@ -4,12 +4,12 @@ import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.DBTestBase
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.ApplicationTest
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiProvider
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.Examples
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ApplicationController
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.query.ApplicationQuery
 import groovy.mock.interceptor.MockFor
 import org.hibernate.Session
 
+import static com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.EventParametersExamples.APP_INSTALL
 import static org.junit.Assert.assertNotNull
 
 /**
@@ -38,7 +38,7 @@ class AppUninstallHandlerTest extends DBTestBase {
 
     //act
     AppUninstallHandler appUninstallHandler = createAppUninstallHandler(bitrixApiProdiverDelegate)
-    appUninstallHandler.processEvent(Examples.EVENT_APP_INSTALL_PARAMETERS)
+    appUninstallHandler.processEvent(APP_INSTALL)
 
 
     //verify

@@ -48,9 +48,9 @@ public class UserStopMessagingHandler extends CommonEventHandler implements Even
     final String serviceId = ParamsExtractor.getServiceId(parameters);
     final String protocol = ParamsExtractor.getProtocol(parameters);
     if (logger.isDebugEnabled())
-      logger.debug("User stop messaging. User ID: " + userId + ". Service: " + serviceId + ". Protocol: " + protocol);
+      logger.debug("User stop messaging. Domain: " + domain + ".User ID: " + userId + ". Service: " + serviceId + ". Protocol: " + protocol);
 
-    Queue queue = getQueue(userId, serviceId, application);
+    Queue queue = getProcessingQueue(userId, serviceId, application);
     if (queue == null)
       return;
 
@@ -76,7 +76,7 @@ public class UserStopMessagingHandler extends CommonEventHandler implements Even
         final String userId = ParamsExtractor.getUserId(parameters);
         final String serviceId = ParamsExtractor.getServiceId(parameters);
 
-        Queue queue = getQueue(userId, serviceId, application);
+        Queue queue = getProcessingQueue(userId, serviceId, application);
         if (queue == null) {
           loggerMessagingSads.error("USER_STOP_MESSAGING response:\n MISSED QUEUE" + "\n");
           response.setCharacterEncoding("UTF-8");
@@ -113,7 +113,7 @@ public class UserStopMessagingHandler extends CommonEventHandler implements Even
     }
   }
 
-  private Queue getQueue(String userId, String serviceId, Application application) {
+  private Queue getProcessingQueue(String userId, String serviceId, Application application) {
     User user = userController.find(userId);
 
     if (user == null)

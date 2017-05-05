@@ -53,11 +53,7 @@ public class CommonEventHandler {
     return ParamsExtractor.getChatType(parameters) == Chat.Type.PRIVATE;
   }
 
-  protected boolean isGroupChat(Map<String, String[]> parameters) {
-    return ParamsExtractor.getChatType(parameters) == Chat.Type.GROUP;
-  }
-
-  protected void processIdChatNotJoined(Map<String, String[]> parameters, Application application) {
+  protected void processIfChatNotJoined(Map<String, String[]> parameters, Application application) {
     final Chat.Type chatType = ParamsExtractor.getChatType(parameters);
 
     switch (chatType){

@@ -2,23 +2,20 @@ package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.event
 
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.DBTestBase
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.ApplicationTest
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.chat.Chat
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.chat.ChatTest
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.operator.Operator
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.operator.OperatorTest
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.Examples
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.DBService
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.InitHelper
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.LocalizationHelper
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.ModelStateChecker
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ApplicationController
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ChatController
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.OperatorController
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.query.ChatQuery
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.query.OperatorQuery
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor
 import groovy.mock.interceptor.MockFor
-import org.hibernate.Session
+
+import static com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.EventParametersExamples.BOT_JOIN_GROUP_CHAT
+import static com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.EventParametersExamples.BOT_JOIN_PRIVATE_CHAT
 
 /**
  * author: Artem Voronov
@@ -34,25 +31,6 @@ class BotJoinToChatHandlerTest extends DBTestBase {
     return new BotJoinToChatHandler(chatController, operatorController, messageDeliveryProvider, resourceBundleController, applicationController)
   }
 
-  static Chat preInstallChat(DBService dbService, Application application) {
-    Chat.Type chatType = ParamsExtractor.getChatType(Examples.EVENT_BOT_JOIN_GROUP_CHAT_PARAMETERS)
-    int chatId = ParamsExtractor.getChatId(Examples.EVENT_BOT_JOIN_GROUP_CHAT_PARAMETERS, chatType)
-    def chat = ChatTest.createCorrectChat(application: application, chatId: chatId, type: chatType)
-
-    dbService.tx { s -> s.save(chat) }
-
-    return chat
-  }
-
-  static Operator preInstallOperator(DBService dbService, Application application) {
-    int operatorId = ParamsExtractor.getOperatorId(Examples.EVENT_BOT_JOIN_PRIVATE_CHAT_PARAMETERS)
-    def chat = OperatorTest.createCorrectOperator(application: application, operatorId: operatorId)
-
-    dbService.tx { s -> s.save(chat) }
-
-    return chat
-  }
-
   /**
    * Бот подключился в приватный чат. Оператора в БД ещё нет. Проверям что:
    * 1. в БД был сохранён оператор
@@ -60,26 +38,21 @@ class BotJoinToChatHandlerTest extends DBTestBase {
    */
   void testJoinToPrivateChatNotPersisted() {
     //init
-    Application application = AppInstallHandlerTest.preInstallApplication(db)
+    Application application = InitHelper.preInstallApplication(db)
     MockFor messageDeliveryProviderMock = new MockFor(MessageDeliveryProvider)
-    messageDeliveryProviderMock.demand.sendMessageToChat(1) { Application app, String dialogId, String message ->}
+    messageDeliveryProviderMock.demand.sendMessageToChat(1) { Application app, String dialogId, String msg ->
+      assertEquals LocalizationHelper.getLocalizedMessage(app.language, "welcome"), msg
+    }
     MessageDeliveryProvider messageDeliveryProviderDelegate = messageDeliveryProviderMock.proxyDelegateInstance()
 
 
     //act
     BotJoinToChatHandler botJoinToChatHandler = createBotJoinToChatHandler(messageDeliveryProviderDelegate)
-    botJoinToChatHandler.processEvent(Examples.EVENT_BOT_JOIN_PRIVATE_CHAT_PARAMETERS)
+    botJoinToChatHandler.processEvent(BOT_JOIN_PRIVATE_CHAT)
 
 
     //verify
-    vtx { Session s ->
-      Operator operator = OperatorQuery.all(s).uniqueResult() as Operator
-
-      assertNotNull operator
-      assertNotNull operator.id
-      assertNotNull operator.operatorId
-      ApplicationTest.assertApplicationsEquals application, operator.application
-    }
+    ModelStateChecker.assertOperatorWasCreated(db, application)
     messageDeliveryProviderMock.verify(messageDeliveryProviderDelegate)
   }
 
@@ -90,28 +63,22 @@ class BotJoinToChatHandlerTest extends DBTestBase {
    */
   void testJoinToPrivateChatPersisted() {
     //init
-    Application application = AppInstallHandlerTest.preInstallApplication(db)
-    Operator operator = preInstallOperator(db, application)
+    Application application = InitHelper.preInstallApplication(db)
+    Operator operator = InitHelper.preInstallOperator(db, application)
     MockFor messageDeliveryProviderMock = new MockFor(MessageDeliveryProvider)
-    messageDeliveryProviderMock.demand.sendMessageToChat(1) { Application app, String dialogId, String message ->}
+    messageDeliveryProviderMock.demand.sendMessageToChat(1) { Application app, String dialogId, String msg ->
+      assertEquals LocalizationHelper.getLocalizedMessage(app.language, "welcome"), msg
+    }
     MessageDeliveryProvider messageDeliveryProviderDelegate = messageDeliveryProviderMock.proxyDelegateInstance()
 
 
     //act
     BotJoinToChatHandler botJoinToChatHandler = createBotJoinToChatHandler(messageDeliveryProviderDelegate)
-    botJoinToChatHandler.processEvent(Examples.EVENT_BOT_JOIN_PRIVATE_CHAT_PARAMETERS)
+    botJoinToChatHandler.processEvent(BOT_JOIN_PRIVATE_CHAT)
 
 
     //verify
-    vtx { Session s ->
-      List<Operator> operators = OperatorQuery.all(s).list()
-
-      assertNotNull operators
-      assertEquals 1, operators.size()
-      Operator another = operators.get(0)
-      OperatorTest.assertOperatorsEquals operator, another
-    }
-
+    ModelStateChecker.assertExistsOnlyOneOperator(db, operator)
     messageDeliveryProviderMock.verify(messageDeliveryProviderDelegate)
   }
 
@@ -122,27 +89,21 @@ class BotJoinToChatHandlerTest extends DBTestBase {
    */
   void testJoinToGroupChatNotPersisted() {
     //init
-    Application application = AppInstallHandlerTest.preInstallApplication(db)
+    Application application = InitHelper.preInstallApplication(db)
     MockFor messageDeliveryProviderMock = new MockFor(MessageDeliveryProvider)
-    messageDeliveryProviderMock.demand.sendMessageToChat(1) { Application app, String dialogId, String message ->}
+    messageDeliveryProviderMock.demand.sendMessageToChat(1) { Application app, String dialogId, String msg ->
+      assertEquals LocalizationHelper.getLocalizedMessage(app.language, "welcome"), msg
+    }
     MessageDeliveryProvider messageDeliveryProviderDelegate = messageDeliveryProviderMock.proxyDelegateInstance()
 
 
     //act
     BotJoinToChatHandler botJoinToChatHandler = createBotJoinToChatHandler(messageDeliveryProviderDelegate)
-    botJoinToChatHandler.processEvent(Examples.EVENT_BOT_JOIN_GROUP_CHAT_PARAMETERS)
+    botJoinToChatHandler.processEvent(BOT_JOIN_GROUP_CHAT)
 
 
     //verify
-    vtx { Session s ->
-      Chat chat = ChatQuery.all(s).uniqueResult() as Chat
-
-      assertNotNull chat
-      assertNotNull chat.id
-      assertNotNull chat.chatId
-      assertEquals Chat.Type.GROUP, chat.type
-      ApplicationTest.assertApplicationsEquals application, chat.application
-    }
+    ModelStateChecker.assertChatWasCreated(db, application)
     messageDeliveryProviderMock.verify(messageDeliveryProviderDelegate)
   }
 
@@ -153,28 +114,22 @@ class BotJoinToChatHandlerTest extends DBTestBase {
    */
   void testJoinToGroupChatPersisted() {
     //init
-    Application application = AppInstallHandlerTest.preInstallApplication(db)
-    Chat chat  = preInstallChat(db, application)
+    Application application = InitHelper.preInstallApplication(db)
+    Chat chat = InitHelper.preInstallChat(db, application)
     MockFor messageDeliveryProviderMock = new MockFor(MessageDeliveryProvider)
-    messageDeliveryProviderMock.demand.sendMessageToChat(1) { Application app, String dialogId, String message ->}
+    messageDeliveryProviderMock.demand.sendMessageToChat(1) { Application app, String dialogId, String msg ->
+      assertEquals LocalizationHelper.getLocalizedMessage(app.language, "welcome"), msg
+    }
     MessageDeliveryProvider messageDeliveryProviderDelegate = messageDeliveryProviderMock.proxyDelegateInstance()
 
 
     //act
     BotJoinToChatHandler botJoinToChatHandler = createBotJoinToChatHandler(messageDeliveryProviderDelegate)
-    botJoinToChatHandler.processEvent(Examples.EVENT_BOT_JOIN_PRIVATE_CHAT_PARAMETERS)
+    botJoinToChatHandler.processEvent(BOT_JOIN_PRIVATE_CHAT)
 
 
     //verify
-    vtx { Session s ->
-      List<Chat> chats = ChatQuery.all(s).list()
-
-      assertNotNull chats
-      assertEquals 1, chats.size()
-      Chat another = chats.get(0)
-      ChatTest.assertChatsEquals chat, another
-    }
-
+    ModelStateChecker.assertExistsOnlyOneChat(db, chat)
     messageDeliveryProviderMock.verify(messageDeliveryProviderDelegate)
   }
 
@@ -184,24 +139,18 @@ class BotJoinToChatHandlerTest extends DBTestBase {
    * 2. никаких сообщение не отправлялось
    */
   void testUnknownApplicationInGroupChat() {
+    //init
     MockFor messageDeliveryProviderMock = new MockFor(MessageDeliveryProvider)
-    messageDeliveryProviderMock.demand.sendMessageToChat(0) { Application app, String dialogId, String message ->}
     MessageDeliveryProvider messageDeliveryProviderDelegate = messageDeliveryProviderMock.proxyDelegateInstance()
 
 
     //act
     BotJoinToChatHandler botJoinToChatHandler = createBotJoinToChatHandler(messageDeliveryProviderDelegate)
-    botJoinToChatHandler.processEvent(Examples.EVENT_BOT_JOIN_PRIVATE_CHAT_PARAMETERS)
+    botJoinToChatHandler.processEvent(BOT_JOIN_PRIVATE_CHAT)
 
 
     //verify
-    vtx { Session s ->
-      List<Chat> chats = ChatQuery.all(s).list()
-
-      assertNotNull chats
-      assertEquals 0, chats.size()
-    }
-
+    ModelStateChecker.assertNoChats(db)
     messageDeliveryProviderMock.verify(messageDeliveryProviderDelegate)
   }
 
@@ -211,24 +160,18 @@ class BotJoinToChatHandlerTest extends DBTestBase {
    * 2. никаких сообщений не отправлялось
    */
   void testUnknownApplicationInPrivateChat() {
+    //init
     MockFor messageDeliveryProviderMock = new MockFor(MessageDeliveryProvider)
-    messageDeliveryProviderMock.demand.sendMessageToChat(0) { Application app, String dialogId, String message ->}
     MessageDeliveryProvider messageDeliveryProviderDelegate = messageDeliveryProviderMock.proxyDelegateInstance()
 
 
     //act
     BotJoinToChatHandler botJoinToChatHandler = createBotJoinToChatHandler(messageDeliveryProviderDelegate)
-    botJoinToChatHandler.processEvent(Examples.EVENT_BOT_JOIN_PRIVATE_CHAT_PARAMETERS)
+    botJoinToChatHandler.processEvent(BOT_JOIN_PRIVATE_CHAT)
 
 
     //verify
-    vtx { Session s ->
-      List<Operator> operators = OperatorQuery.all(s).list()
-
-      assertNotNull operators
-      assertEquals 0, operators.size()
-    }
-
+    ModelStateChecker.assertNoOperators(db)
     messageDeliveryProviderMock.verify(messageDeliveryProviderDelegate)
   }
 }

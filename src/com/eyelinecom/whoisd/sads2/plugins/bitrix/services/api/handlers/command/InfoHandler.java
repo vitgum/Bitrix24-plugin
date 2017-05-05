@@ -37,7 +37,7 @@ public class InfoHandler extends CommonEventHandler implements CommandHandler {
     if (application == null)
       return;
 
-    processIdChatNotJoined(parameters, application);
+    processIfChatNotJoined(parameters, application);
     final String dialogId = ParamsExtractor.getDialogId(parameters);
 
     UserCounters counters = queueController.getUserCounters(application);

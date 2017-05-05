@@ -39,8 +39,8 @@ public class TemplateUtils {
   private static final String INVALIDATE_SESSION_RUL = "http://plugins.miniapps.run/invalidate-session?success_url=%s";
 
   private static final char HIDDEN_CHAR = '\u2063';
-  static final String BACK_BUTTON_EN = HIDDEN_CHAR + "Back";
-  static final String BACK_BUTTON_RU = HIDDEN_CHAR + "Назад";
+  public static final String BACK_BUTTON_EN = HIDDEN_CHAR + "Back";
+  public static final String BACK_BUTTON_RU = HIDDEN_CHAR + "Назад";
 
   public static String createRedirectBackPageUrl(String startUrl, String domain, String userId, String serviceId, String protocol, String lang, String backPageUrlOriginal) {
     return String.format(REDIRECT_BACK_PAGE_URL, startUrl, domain, userId, serviceId, protocol, lang, backPageUrlOriginal);

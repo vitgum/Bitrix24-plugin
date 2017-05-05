@@ -47,7 +47,7 @@ public class UserStartMessagingHandler extends CommonEventHandler implements Eve
     final String protocol = ParamsExtractor.getProtocol(parameters);
 
     if (logger.isDebugEnabled())
-      logger.debug("User start messaging. User ID: " + userId + ". Service: " + serviceId + ". Protocol: " + protocol);
+      logger.debug("User start messaging. Domain: " + domain + ".User ID: " + userId + ". Service: " + serviceId + ". Protocol: " + protocol);
   }
 
   @Override

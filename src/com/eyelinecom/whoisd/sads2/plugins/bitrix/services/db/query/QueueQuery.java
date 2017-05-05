@@ -44,6 +44,19 @@ public class QueueQuery {
       .add(Restrictions.eq("operator", operator));
   }
 
+  public static Criteria byTypeAndUser(Application application, User user, String serviceId, QueueType queueType, Session s) {
+    return byApplication(application, s)
+      .add(Restrictions.eq("user", user))
+      .add(Restrictions.eq("serviceId", serviceId))
+      .add(Restrictions.eq("type", queueType));
+  }
+
+  public static Criteria byTypeAndOperator(Operator operator, QueueType queueType, Session s) {
+    return byApplication(operator.getApplication(), s)
+      .add(Restrictions.eq("operator", operator))
+      .add(Restrictions.eq("type", queueType));
+  }
+
   public static Criteria byTypeInAscendingOrder(Application application, QueueType type, Session s) {
     return byApplication(application, s)
       .add(Restrictions.eq("type", type))

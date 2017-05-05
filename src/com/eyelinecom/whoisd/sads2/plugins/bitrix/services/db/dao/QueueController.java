@@ -92,11 +92,11 @@ import java.util.stream.Collectors;
   }
 
   public Queue getProcessingQueue(Operator operator) {
-    return db.tx(s -> (Queue) QueueQuery.byOperator(operator, s).uniqueResult());
+    return db.tx(s -> (Queue) QueueQuery.byTypeAndOperator(operator, QueueType.PROCESSING, s).uniqueResult());
   }
 
   public Queue getProcessingQueue(Application application, User user, String serviceId) {
-    return db.tx(s -> (Queue) QueueQuery.byUser(application, user, serviceId, s).uniqueResult());
+    return db.tx(s -> (Queue) QueueQuery.byTypeAndUser(application, user, serviceId, QueueType.PROCESSING, s).uniqueResult());
   }
 
   public UserCounters getUserCounters(Application application) {
