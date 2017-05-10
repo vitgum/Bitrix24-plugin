@@ -73,7 +73,7 @@ public class ParamsExtractor {
       if (parameters.containsKey("data[LANGUAGE_ID]"))
         return parameters.get("data[LANGUAGE_ID]")[0];
 
-      return parameters.containsKey("lang") ? parameters.get("lang")[0] : parameters.get("data[PARAMS][LANGUAGE]")[0];
+      return parameters.containsKey("locale") ? parameters.get("locale")[0] : parameters.get("data[PARAMS][LANGUAGE]")[0];
     } catch (Exception ex) {
       logger.error("Unable to extract language", ex);
       return "en";
@@ -83,9 +83,11 @@ public class ParamsExtractor {
   public static String getBackPageUrl(Map<String, String[]> parameters) {
     return parameters.get("back_page")[0];
   }
+
   public static String getRedirectBackPageUrl(Map<String, String[]> parameters) {
     return parameters.get("redirect_back_page")[0];
   }
+
   public static String getBackPageUrlOriginal(Map<String, String[]> parameters) {
     return parameters.get("back_page_original")[0];
   }

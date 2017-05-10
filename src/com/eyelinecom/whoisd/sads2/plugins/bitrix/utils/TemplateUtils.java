@@ -18,9 +18,9 @@ public class TemplateUtils {
       "</navigation>" +
     "</page>";
 
-  private static final String REDIRECT_BACK_PAGE_URL = "%s?domain=%s&user_id=%s&service=%s&protocol=%slang=%s&back_page_original=%s";
+  private static final String REDIRECT_BACK_PAGE_URL = "%s?domain=%s&user_id=%s&service=%s&protocol=%slocale=%s&back_page_original=%s";
 
-  private static final String INPUT_URL = "%s?domain=%s&lang=%s&redirect_back_page=%s";
+  private static final String INPUT_URL = "%s?domain=%s&locale=%s&redirect_back_page=%s";
 
   private static final String BASIC_PAGE = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
     "<page version=\"2.0\">" +
