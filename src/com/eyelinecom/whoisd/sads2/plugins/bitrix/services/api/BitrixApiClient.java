@@ -41,7 +41,9 @@ import java.util.stream.Collectors;
 /**
  * author: Artem Voronov
  */
-public class BitrixApiClient implements BitrixApiProvider {
+//todo Пакет api переименовать в bitrix
+public class BitrixApiClient implements BitrixApiProvider { //todo Это переименовываем в BitrixService
+  //todo Отделить клиента от сервиса Bitrix и вынести на уровень com.eyelinecom.whoisd.sads2.plugins.bitrix
   private static final Logger logger = Logger.getLogger("BITRIX_API_CLIENT");
   private static final Logger loggerRateLimiting = Logger.getLogger("BITRIX_API_CLIENT_RATE_LIMITING");
   private static final ObjectMapper mapper = new ObjectMapper();
@@ -304,6 +306,7 @@ public class BitrixApiClient implements BitrixApiProvider {
       }
     }
 
+    @SuppressWarnings("unchecked")
     private void sendNotifications() {
       DBService db = PluginContext.getInstance().getDBService();
       MessageDeliveryProvider messageDeliveryProvider = PluginContext.getInstance().getMessageDeliveryProvider();

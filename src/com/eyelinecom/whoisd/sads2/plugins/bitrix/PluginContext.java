@@ -68,7 +68,7 @@ public class PluginContext {
     return pluginUrl;
   }
 
-  @Produces
+  @Produces //todo Remove CDI + jar libs
   public DBService getDBService() {
     return services.getDbService();
   }

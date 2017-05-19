@@ -7,7 +7,7 @@ import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.query.UserQuery;
 /**
  * author: Artem Voronov
  */
-public class UserController {
+public class UserController { //todo Поднять в api и обозвать DAO
 
   private DBService db;
 

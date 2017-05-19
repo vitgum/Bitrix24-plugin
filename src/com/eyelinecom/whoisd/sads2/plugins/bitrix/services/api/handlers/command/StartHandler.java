@@ -48,6 +48,7 @@ public class StartHandler extends CommonEventHandler implements CommandHandler {
       return;
     }
 
+    //todo Синхронизироваться по queueController, убрать синхронизацию с декларации метода
     Operator operator = getOrCreateOperator(parameters, application);
     if (queueController.isOperatorBusy(operator)) {
       messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang,"already.messaging.with.user"));

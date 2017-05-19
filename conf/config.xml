@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 
 <config>
+
+  <!--TODO: если будет один конфиг под все плагины, то лучше сделать секцию под плагин и всё перенести внуть как подсекции-->
+  <!--<section name="bitrix.plugin">-->
   <param name="deploy.url" type="string">DEPLOY_URL/bitrix-plugin/bitrix</param>
   <param name="plugin.url" type="string">http://plugins.miniapps.run/bitrix</param>
   <param name="push.url" type="string">https://api.miniapps.run/push</param>
@@ -37,5 +40,6 @@
     <param name="thread.pool.maximum.pool.size" type="int">200</param>
     <param name="thread.pool.keep.alive.time.sec" type="long">60</param>
   </section>
+  <!--</section>-->
 
 </config>
