@@ -38,7 +38,7 @@ public class UserStopMessagingHandler extends CommonEventHandler implements Even
   }
 
   @Override
-  public synchronized void processEvent(Map<String, String[]> parameters) {
+  public void processEvent(Map<String, String[]> parameters) {
     final String domain = ParamsExtractor.getDomain(parameters);
     Application application = applicationDAO.find(domain);
     if (application == null)
@@ -54,8 +54,10 @@ public class UserStopMessagingHandler extends CommonEventHandler implements Even
     if (queue == null)
       return;
 
-    queueDAO.removeFromQueue(queue.getApplication(), queue.getUser(), queue.getServiceId());
-    messageDeliveryProvider.sendMessageToOperator(queue.getOperator(), getLocalizedMessage(application.getLanguage(), "user.quit"));
+    synchronized (queueDAO) {
+      queueDAO.removeFromQueue(queue.getApplication(), queue.getUser(), queue.getServiceId());
+      messageDeliveryProvider.sendMessageToOperator(queue.getOperator(), getLocalizedMessage(application.getLanguage(), "user.quit"));
+    }
   }
 
   @Override

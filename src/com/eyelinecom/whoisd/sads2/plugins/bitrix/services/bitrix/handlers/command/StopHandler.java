@@ -32,7 +32,7 @@ public class StopHandler extends CommonEventHandler implements CommandHandler  {
   }
 
   @Override
-  public synchronized void handle(Map<String, String[]> parameters) {
+  public void handle(Map<String, String[]> parameters) {
     final String domain = ParamsExtractor.getDomain(parameters);
 
     Application application = applicationDAO.find(domain);
@@ -48,18 +48,20 @@ public class StopHandler extends CommonEventHandler implements CommandHandler  {
     }
 
     Operator operator = getOrCreateOperator(parameters, application);
-    Queue queue = queueDAO.getProcessingQueue(operator);
+    synchronized (queueDAO) {
+      Queue queue = queueDAO.getProcessingQueue(operator);
 
-    if (queue!=null) {
-      if (logger.isDebugEnabled()) {
-        String operatorFullName = ParamsExtractor.getOperatorFullNameWithEncoding(parameters);
-        logger.debug("Operator stop messaging. Application domain: " + domain + ". Operator ID: " + operator.getId() + ". Operator name: " + operatorFullName + ". User ID: " + queue.getUser().getUserId() + ". Service ID: " + queue.getServiceId());
+      if (queue != null) {
+        if (logger.isDebugEnabled()) {
+          String operatorFullName = ParamsExtractor.getOperatorFullNameWithEncoding(parameters);
+          logger.debug("Operator stop messaging. Application domain: " + domain + ". Operator ID: " + operator.getId() + ". Operator name: " + operatorFullName + ". User ID: " + queue.getUser().getUserId() + ". Service ID: " + queue.getServiceId());
+        }
+        queueDAO.removeFromQueue(queue.getApplication(), queue.getUser(), queue.getServiceId());
+        messageDeliveryProvider.sendMessageToUser(queue, getLocalizedMessage(queue.getLanguage(), "operator.quit"));
+        messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang, "user.flushed"));
+      } else {
+        messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang, "user.not.flushed"));
       }
-      queueDAO.removeFromQueue(queue.getApplication(), queue.getUser(), queue.getServiceId());
-      messageDeliveryProvider.sendMessageToUser(queue, getLocalizedMessage(queue.getLanguage(),"operator.quit"));
-      messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang,"user.flushed")) ;
-    } else {
-      messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang,"user.not.flushed"));
     }
   }
 }

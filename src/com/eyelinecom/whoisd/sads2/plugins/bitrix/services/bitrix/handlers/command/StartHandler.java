@@ -33,7 +33,7 @@ public class StartHandler extends CommonEventHandler implements CommandHandler {
   }
 
   @Override
-  public synchronized void handle(Map<String, String[]> parameters) {
+  public void handle(Map<String, String[]> parameters) {
     final String domain = ParamsExtractor.getDomain(parameters);
 
     Application application = applicationDAO.find(domain);
@@ -44,36 +44,38 @@ public class StartHandler extends CommonEventHandler implements CommandHandler {
 
     if (!isPrivateChat(parameters)) {
       final String dialogId = ParamsExtractor.getDialogId(parameters);
-      messageDeliveryProvider.sendMessageToChat(application, dialogId, getLocalizedMessage(appLang,"only.for.private.chats"));
+      messageDeliveryProvider.sendMessageToChat(application, dialogId, getLocalizedMessage(appLang, "only.for.private.chats"));
       return;
     }
 
-    //todo Синхронизироваться по queueController, убрать синхронизацию с декларации метода
     Operator operator = getOrCreateOperator(parameters, application);
-    if (queueDAO.isOperatorBusy(operator)) {
-      messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang,"already.messaging.with.user"));
-      return;
-    }
 
-    Queue firstAwaiting = queueDAO.getFirstAwaiting(application);
+    synchronized (queueDAO) {
+      if (queueDAO.isOperatorBusy(operator)) {
+        messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang, "already.messaging.with.user"));
+        return;
+      }
 
-    if (firstAwaiting == null) {
-      messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang,"no.users"));
-    } else {
-      Integer queueId = firstAwaiting.getId();
-      queueDAO.moveToProcessingQueue(queueId, operator);
+      Queue firstAwaiting = queueDAO.getFirstAwaiting(application);
 
-      String userMessages = queueDAO.getMessages(queueId);
-      messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang, "message.from", firstAwaiting.getProtocol()) + "\n" + userMessages);
+      if (firstAwaiting == null) {
+        messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang, "no.users"));
+      } else {
+        Integer queueId = firstAwaiting.getId();
+        queueDAO.moveToProcessingQueue(queueId, operator);
 
-      queueDAO.deleteMessages(queueId);
+        String userMessages = queueDAO.getMessages(queueId);
+        messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang, "message.from", firstAwaiting.getProtocol()) + "\n" + userMessages);
 
-      String operatorFullName = ParamsExtractor.getOperatorFullNameWithEncoding(parameters);
+        queueDAO.deleteMessages(queueId);
 
-      if (logger.isDebugEnabled())
-        logger.debug("Operator start messaging. Application domain: " + domain + ". Operator ID: " + operator.getId() + ". Operator name: " + operatorFullName + ". User ID: " + firstAwaiting.getUser().getUserId()+ ". Service ID: " + firstAwaiting.getServiceId());
+        String operatorFullName = ParamsExtractor.getOperatorFullNameWithEncoding(parameters);
 
-      messageDeliveryProvider.sendMessageToUser(firstAwaiting, getLocalizedMessage(firstAwaiting.getLanguage(), "operator.greetings", operatorFullName));
+        if (logger.isDebugEnabled())
+          logger.debug("Operator start messaging. Application domain: " + domain + ". Operator ID: " + operator.getId() + ". Operator name: " + operatorFullName + ". User ID: " + firstAwaiting.getUser().getUserId() + ". Service ID: " + firstAwaiting.getServiceId());
+
+        messageDeliveryProvider.sendMessageToUser(firstAwaiting, getLocalizedMessage(firstAwaiting.getLanguage(), "operator.greetings", operatorFullName));
+      }
     }
   }
 }
