@@ -1,14 +1,12 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix;
 
-import com.eyeline.utils.config.xml.XmlConfig;
+import com.eyeline.utils.config.xml.XmlConfigSection;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.Services;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiProvider;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.BitrixApiProvider;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.DBService;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.*;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 
-import javax.ws.rs.Produces;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -24,14 +22,14 @@ public class PluginContext {
   private final String pluginUrl;
 
 
-  private PluginContext(XmlConfig config, String deployUrl, String sadsPushUrl, String pluginUrl) throws Exception {
+  private PluginContext(XmlConfigSection config, String deployUrl, String sadsPushUrl, String pluginUrl) throws Exception {
     this.services = new Services(config);
     this.deployUrl = deployUrl;
     this.sadsPushUrl = sadsPushUrl;
     this.pluginUrl = pluginUrl;
   }
 
-  static void init(XmlConfig config, String deployUrl, String sadsPushUrl, String pluginUrl) throws Exception {
+  static void init(XmlConfigSection config, String deployUrl, String sadsPushUrl, String pluginUrl) throws Exception {
     if(instance == null) {
       instance = new PluginContext(config, deployUrl, sadsPushUrl, pluginUrl);
       initLatch.countDown();
@@ -68,47 +66,18 @@ public class PluginContext {
     return pluginUrl;
   }
 
-  @Produces //todo Remove CDI + jar libs
   public DBService getDBService() {
     return services.getDbService();
   }
 
-  @Produces
   public BitrixApiProvider getBitrixApiProvider() {
     return services.getBitrixApiProvider();
   }
 
-  @Produces
   public MessageDeliveryProvider getMessageDeliveryProvider() {
     return services.getMessageDeliveryProvider();
   }
 
-  @Produces
-  public ApplicationController getApplicationController() {
-    return services.getApplicationController();
-  }
-
-  @Produces
-  public UserController getUserController() {
-    return services.getUserController();
-  }
-
-  @Produces
-  public QueueController getQueueController() {
-    return services.getQueueController();
-  }
-
-  @Produces
-  public ChatController getChatController() {
-    return services.getChatController();
-  }
-
-  @Produces
-  public OperatorController getOperatorController() {
-    return services.getOperatorController();
-  }
-
-  @Produces
   public ResourceBundleController getResourceBundleController() {
     return services.getResourceBundleController();
   }

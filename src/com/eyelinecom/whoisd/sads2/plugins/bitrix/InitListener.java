@@ -3,10 +3,10 @@ package com.eyelinecom.whoisd.sads2.plugins.bitrix;
 import com.eyeline.utils.config.ConfigException;
 import com.eyeline.utils.config.xml.XmlConfig;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.Services;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.command.*;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.event.*;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.model.Command;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.model.Event;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.handlers.command.*;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.handlers.event.*;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.model.Command;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.model.Event;
 import org.apache.log4j.PropertyConfigurator;
 
 import javax.servlet.ServletContextEvent;
@@ -74,7 +74,8 @@ public class InitListener implements ServletContextListener {
 
   private void initPluginContext(XmlConfig config, String deployUrl, String pushUrl, String pluginUrl) {
     try {
-      PluginContext.init(config, deployUrl, pushUrl, pluginUrl);
+
+      PluginContext.init(config.getSection("bitrix.plugin"), deployUrl, pushUrl, pluginUrl);
     }
     catch(Exception e) {
       e.printStackTrace();
@@ -84,21 +85,21 @@ public class InitListener implements ServletContextListener {
 
   private void initHandlers() {
     Services services = PluginContext.getInstance().getServices();
-    EventProcessor.addHandler(Event.ONAPPINSTALL, new AppInstallHandler(services.getApplicationController(), services.getBitrixApiProvider()));
-    EventProcessor.addHandler(Event.ONIMBOTDELETE, new AppUninstallHandler(services.getApplicationController(), services.getBitrixApiProvider()));
-    EventProcessor.addHandler(Event.ONAPPUPDATE, new AppUpdateHandler(services.getApplicationController()));
-    EventProcessor.addHandler(Event.ONIMBOTMESSAGEADD, new MessageFromOperatorHandler(services.getChatController(), services.getOperatorController(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationController(), services.getQueueController()));
-    EventProcessor.addHandler(Event.ONIMBOTJOINCHAT, new BotJoinToChatHandler(services.getChatController(), services.getOperatorController(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationController()));
+    EventProcessor.addHandler(Event.ONAPPINSTALL, new AppInstallHandler(services.getApplicationDAO(), services.getBitrixApiProvider()));
+    EventProcessor.addHandler(Event.ONIMBOTDELETE, new AppUninstallHandler(services.getApplicationDAO(), services.getBitrixApiProvider()));
+    EventProcessor.addHandler(Event.ONAPPUPDATE, new AppUpdateHandler(services.getApplicationDAO()));
+    EventProcessor.addHandler(Event.ONIMBOTMESSAGEADD, new MessageFromOperatorHandler(services.getChatDAO(), services.getOperatorDAO(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationDAO(), services.getQueueDAO()));
+    EventProcessor.addHandler(Event.ONIMBOTJOINCHAT, new BotJoinToChatHandler(services.getChatDAO(), services.getOperatorDAO(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationDAO()));
     EventProcessor.addHandler(Event.ONIMCOMMANDADD, new CommandFromOperatorHandler());
 
-    EventProcessor.addHandler(Event.MESSAGE, new MessageFromUserHandler(services.getChatController(), services.getOperatorController(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationController(), services.getQueueController(), services.getUserController()));
-    EventProcessor.addHandler(Event.LINK, new UserStartMessagingHandler(services.getChatController(), services.getOperatorController(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationController()));
-    EventProcessor.addHandler(Event.BACK, new UserStopMessagingHandler(services.getChatController(), services.getOperatorController(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationController(), services.getQueueController(), services.getUserController()));
+    EventProcessor.addHandler(Event.MESSAGE, new MessageFromUserHandler(services.getChatDAO(), services.getOperatorDAO(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationDAO(), services.getQueueDAO(), services.getUserDAO()));
+    EventProcessor.addHandler(Event.LINK, new UserStartMessagingHandler(services.getChatDAO(), services.getOperatorDAO(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationDAO()));
+    EventProcessor.addHandler(Event.BACK, new UserStopMessagingHandler(services.getChatDAO(), services.getOperatorDAO(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationDAO(), services.getQueueDAO(), services.getUserDAO()));
 
-    CommandProcessor.addHandler(Command.HELP, new HelpHandler(services.getChatController(), services.getOperatorController(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationController()));
-    CommandProcessor.addHandler(Command.INFO, new InfoHandler(services.getChatController(), services.getOperatorController(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationController(), services.getQueueController()));
-    CommandProcessor.addHandler(Command.START, new StartHandler(services.getChatController(), services.getOperatorController(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationController(), services.getQueueController()));
-    CommandProcessor.addHandler(Command.STOP, new StopHandler(services.getChatController(), services.getOperatorController(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationController(), services.getQueueController()));
+    CommandProcessor.addHandler(Command.HELP, new HelpHandler(services.getChatDAO(), services.getOperatorDAO(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationDAO()));
+    CommandProcessor.addHandler(Command.INFO, new InfoHandler(services.getChatDAO(), services.getOperatorDAO(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationDAO(), services.getQueueDAO()));
+    CommandProcessor.addHandler(Command.START, new StartHandler(services.getChatDAO(), services.getOperatorDAO(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationDAO(), services.getQueueDAO()));
+    CommandProcessor.addHandler(Command.STOP, new StopHandler(services.getChatDAO(), services.getOperatorDAO(), services.getMessageDeliveryProvider(), services.getResourceBundleController(), services.getApplicationDAO(), services.getQueueDAO()));
   }
 
   private String getDeployUrl(XmlConfig config) {

@@ -2,10 +2,9 @@ package com.eyelinecom.whoisd.sads2.plugins.bitrix.services;
 
 import com.eyeline.utils.ThreadFactoryWithCounter;
 import com.eyeline.utils.config.ConfigException;
-import com.eyeline.utils.config.xml.XmlConfig;
 import com.eyeline.utils.config.xml.XmlConfigSection;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiClient;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiProvider;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.BitrixApiService;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.BitrixApiProvider;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.DBService;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.*;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
@@ -22,28 +21,28 @@ public class Services {
   private final DBService dbService;
   private final ScheduledExecutorService scheduledExecutorService;
   private final BitrixApiProvider bitrixApiProvider;
-  private final ApplicationController applicationController;
-  private final UserController userController;
-  private final QueueController queueController;
+  private final ApplicationDAO applicationDAO;
+  private final UserDAO userDAO;
+  private final QueueDAO queueDAO;
   private final MessageDeliveryProvider messageDeliveryProvider;
-  private final ChatController chatController;
-  private final OperatorController operatorController;
+  private final ChatDAO chatDAO;
+  private final OperatorDAO operatorDAO;
   private final ResourceBundleController resourceBundleController;
 
-  public Services(XmlConfig config) throws ServicesException {
+  public Services(XmlConfigSection config) throws ServicesException {
     this.dbService = initDBService(config);
     this.scheduledExecutorService = initScheduledExecutorService(config);
-    this.messageDeliveryProvider = new MessageDeliveryService();
-    this.bitrixApiProvider = initBitrixApiClient(config, scheduledExecutorService);
-    this.applicationController = new ApplicationController(dbService);
-    this.userController = new UserController(dbService);
-    this.queueController = new QueueController(dbService);
-    this.chatController = new ChatController(dbService);
-    this.operatorController = new OperatorController(dbService);
+    this.applicationDAO = new ApplicationDAO(dbService);
+    this.userDAO = new UserDAO(dbService);
+    this.queueDAO = new QueueDAO(dbService);
+    this.chatDAO = new ChatDAO(dbService);
+    this.operatorDAO = new OperatorDAO(dbService);
     this.resourceBundleController = new ResourceBundleController();
+    this.bitrixApiProvider = initBitrixApiService(config, scheduledExecutorService, applicationDAO);
+    this.messageDeliveryProvider = new MessageDeliveryService(bitrixApiProvider, chatDAO);
   }
 
-  private DBService initDBService(XmlConfig config) throws ServicesException {
+  private DBService initDBService(XmlConfigSection config) throws ServicesException {
     try {
       Properties hibernateProperties = config.getSection("db").toProperties(".");
       return new DBService(hibernateProperties);
@@ -53,7 +52,7 @@ public class Services {
     }
   }
 
-  private BitrixApiClient initBitrixApiClient(XmlConfig config, ScheduledExecutorService scheduledExecutorService) throws ServicesException {
+  private BitrixApiService initBitrixApiService(XmlConfigSection config, ScheduledExecutorService scheduledExecutorService, ApplicationDAO applicationDAO) throws ServicesException {
     try {
       String callbackUrl = config.getString("deploy.url");
 
@@ -66,14 +65,14 @@ public class Services {
       String botName = apiClientSection.getString("bitrix.api.client.bot.name");
       String botAvatarPath = apiClientSection.getString("bitrix.api.client.bot.avatar.path");
       long notificationTimeoutInSeconds = apiClientSection.getLong("bitrix.api.client.notification.timeout.seconds");
-      return new BitrixApiClient(scheduledExecutorService, appId, appSecret, appCode, callbackUrl, botName, botAvatarPath, connectTimeout, requestTimeout, notificationTimeoutInSeconds);
+      return new BitrixApiService(scheduledExecutorService, appId, appSecret, appCode, callbackUrl, botName, botAvatarPath, connectTimeout, requestTimeout, notificationTimeoutInSeconds, applicationDAO);
     }
     catch(ConfigException e) {
-      throw new ServicesException("Error during BitrixApiClient initialization.", e);
+      throw new ServicesException("Error during BitrixApiService initialization.", e);
     }
   }
 
-  private ScheduledExecutorService initScheduledExecutorService(XmlConfig config) throws ServicesException {
+  private ScheduledExecutorService initScheduledExecutorService(XmlConfigSection config) throws ServicesException {
     try {
       XmlConfigSection threadPoolSection = config.getSection("thread.pool");
       int corePoolSize = threadPoolSection.getInt("thread.pool.core.pool.size");
@@ -102,24 +101,24 @@ public class Services {
     return messageDeliveryProvider;
   }
 
-  public ApplicationController getApplicationController() {
-    return applicationController;
+  public ApplicationDAO getApplicationDAO() {
+    return applicationDAO;
   }
 
-  public UserController getUserController() {
-    return userController;
+  public UserDAO getUserDAO() {
+    return userDAO;
   }
 
-  public QueueController getQueueController() {
-    return queueController;
+  public QueueDAO getQueueDAO() {
+    return queueDAO;
   }
 
-  public ChatController getChatController() {
-    return chatController;
+  public ChatDAO getChatDAO() {
+    return chatDAO;
   }
 
-  public OperatorController getOperatorController() {
-    return operatorController;
+  public OperatorDAO getOperatorDAO() {
+    return operatorDAO;
   }
 
   public ResourceBundleController getResourceBundleController() {

@@ -1,7 +1,7 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.web;
 
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.handlers.event.EventProcessor;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.model.Event;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.handlers.event.EventProcessor;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.model.Event;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor;
 
 import javax.servlet.ServletException;

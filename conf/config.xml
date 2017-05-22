@@ -1,45 +1,42 @@
 <?xml version="1.0"?>
 
 <config>
+  <section name="bitrix.plugin">
+    <param name="deploy.url" type="string">DEPLOY_URL/bitrix-plugin/bitrix</param>
+    <param name="plugin.url" type="string">http://plugins.miniapps.run/bitrix</param>
+    <param name="push.url" type="string">https://api.miniapps.run/push</param>
 
-  <!--TODO: если будет один конфиг под все плагины, то лучше сделать секцию под плагин и всё перенести внуть как подсекции-->
-  <!--<section name="bitrix.plugin">-->
-  <param name="deploy.url" type="string">DEPLOY_URL/bitrix-plugin/bitrix</param>
-  <param name="plugin.url" type="string">http://plugins.miniapps.run/bitrix</param>
-  <param name="push.url" type="string">https://api.miniapps.run/push</param>
+    <section name="bitrix.api.client">
+      <param name="bitrix.api.client.connectTimeout.millis">30000</param>
+      <param name="bitrix.api.client.requestTimeout.millis">30000</param>
+      <param name="bitrix.api.client.app.id">CLIENT_APP_ID</param>
+      <param name="bitrix.api.client.app.secret">CLIENT_APP_SECRET</param>
+      <param name="bitrix.api.client.app.code">company.chatbot</param>
+      <param name="bitrix.api.client.bot.name">Miniapps Bot</param>
+      <param name="bitrix.api.client.bot.avatar.path">/home/voronov/projects/sads2/content/bitrix/conf/miniapps_logo.jpg</param>
+      <param name="bitrix.api.client.notification.timeout.seconds">30</param>
+    </section>
 
-  <section name="bitrix.api.client">
-    <param name="bitrix.api.client.connectTimeout.millis">30000</param>
-    <param name="bitrix.api.client.requestTimeout.millis">30000</param>
-    <param name="bitrix.api.client.app.id">CLIENT_APP_ID</param>
-    <param name="bitrix.api.client.app.secret">CLIENT_APP_SECRET</param>
-    <param name="bitrix.api.client.app.code">company.chatbot</param>
-    <param name="bitrix.api.client.bot.name">Miniapps Bot</param>
-    <param name="bitrix.api.client.bot.avatar.path">/home/voronov/projects/sads2/content/bitrix/conf/miniapps_logo.jpg</param>
-    <param name="bitrix.api.client.notification.timeout.seconds">30</param>
+    <section name="db">
+      <param name="hibernate.connection.url" type="string">CONNECTION_URL</param>
+      <param name="hibernate.connection.username" type="string">USER_NAME</param>
+      <param name="hibernate.connection.password" type="string">PASSWORD</param>
+      <param name="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</param>
+      <param name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</param>
+      <param name="hibernate.hbm2ddl.auto">validate</param>
+      <param name="hibernate.connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</param>
+      <param name="hibernate.c3p0.timeout">300</param>
+      <param name="hibernate.c3p0.max_statements">50</param>
+      <param name="hibernate.c3p0.idle_test_period">3000</param>
+      <param name="hibernate.c3p0.preferredTestQuery">SELECT 1</param>
+      <param name="hibernate.c3p0.testConnectionOnCheckout">false</param>
+      <param name="application.id" type="string">sads_plugin_bitrix</param>
+    </section>
+
+    <section name="thread.pool">
+      <param name="thread.pool.core.pool.size" type="int">1</param>
+      <param name="thread.pool.maximum.pool.size" type="int">200</param>
+      <param name="thread.pool.keep.alive.time.sec" type="long">60</param>
+    </section>
   </section>
-
-  <section name="db">
-    <param name="hibernate.connection.url" type="string">CONNECTION_URL</param>
-    <param name="hibernate.connection.username" type="string">USER_NAME</param>
-    <param name="hibernate.connection.password" type="string">PASSWORD</param>
-    <param name="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</param>
-    <param name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</param>
-    <param name="hibernate.hbm2ddl.auto">validate</param>
-    <param name="hibernate.connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</param>
-    <param name="hibernate.c3p0.timeout">300</param>
-    <param name="hibernate.c3p0.max_statements">50</param>
-    <param name="hibernate.c3p0.idle_test_period">3000</param>
-    <param name="hibernate.c3p0.preferredTestQuery">SELECT 1</param>
-    <param name="hibernate.c3p0.testConnectionOnCheckout">false</param>
-    <param name="application.id" type="string">sads_plugin_bitrix</param>
-  </section>
-
-  <section name="thread.pool">
-    <param name="thread.pool.core.pool.size" type="int">1</param>
-    <param name="thread.pool.maximum.pool.size" type="int">200</param>
-    <param name="thread.pool.keep.alive.time.sec" type="long">60</param>
-  </section>
-  <!--</section>-->
-
 </config>

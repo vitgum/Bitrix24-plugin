@@ -1,8 +1,8 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.utils;
 
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.chat.Chat;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.model.Command;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.model.Event;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.model.Command;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.model.Event;
 import org.apache.log4j.Logger;
 
 import java.util.Map;

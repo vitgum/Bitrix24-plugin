@@ -6,8 +6,8 @@ import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.chat.Chat;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.operator.Operator;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.queue.Queue;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.user.User;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.api.BitrixApiProvider;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ChatController;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.BitrixApiProvider;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ChatDAO;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.EncodingUtils;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.TemplateUtils;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.PrettyPrintUtils;
@@ -22,6 +22,14 @@ import java.util.List;
  * author: Artem Voronov
  */
 public class MessageDeliveryService implements MessageDeliveryProvider {
+
+  private final BitrixApiProvider bitrixApiProvider;
+  private final ChatDAO chatDAO;
+
+  public MessageDeliveryService(BitrixApiProvider bitrixApiProvider, ChatDAO chatDAO) {
+    this.bitrixApiProvider = bitrixApiProvider;
+    this.chatDAO = chatDAO;
+  }
 
   private static final Logger logger = Logger.getLogger("BITRIX_PLUGIN");
   private static final Logger loggerMessagingSads = Logger.getLogger("BITRIX_PLUGIN_MESSAGING_WITH_SADS");
@@ -46,17 +54,15 @@ public class MessageDeliveryService implements MessageDeliveryProvider {
   }
 
   public void sendMessageToAllChats(Application application, String message) {
-    ChatController chatController = PluginContext.getInstance().getChatController();
-    List<Chat> chats = chatController.find(application, Chat.Type.GROUP);
+    List<Chat> chats = chatDAO.find(application, Chat.Type.GROUP);
 
     for (Chat chat : chats) {
       pushMessageToBitrix(application, chat.getDialogId(), message);
     }
   }
 
-  private static void pushMessageToBitrix(Application application, String dialogId, String message) {
-    BitrixApiProvider api = PluginContext.getInstance().getBitrixApiProvider();
-    api.sendMessage(application, dialogId, message);
+  private void pushMessageToBitrix(Application application, String dialogId, String message) {
+    bitrixApiProvider.sendMessage(application, dialogId, message);
   }
 
   private static void pushMessageToUser(Queue queue, String message) {

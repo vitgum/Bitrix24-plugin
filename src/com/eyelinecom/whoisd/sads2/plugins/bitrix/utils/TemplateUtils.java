@@ -18,7 +18,7 @@ public class TemplateUtils {
       "</navigation>" +
     "</page>";
 
-  private static final String REDIRECT_BACK_PAGE_URL = "%s?domain=%s&user_id=%s&service=%s&protocol=%slocale=%s&back_page_original=%s"; //TODO Кажется здесь перед locale пропущен &
+  private static final String REDIRECT_BACK_PAGE_URL = "%s?domain=%s&user_id=%s&service=%s&protocol=%s?locale=%s&back_page_original=%s";
 
   private static final String INPUT_URL = "%s?domain=%s&locale=%s&redirect_back_page=%s";
 
