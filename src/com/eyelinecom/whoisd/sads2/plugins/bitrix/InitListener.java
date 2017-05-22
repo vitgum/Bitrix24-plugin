@@ -2,6 +2,7 @@ package com.eyelinecom.whoisd.sads2.plugins.bitrix;
 
 import com.eyeline.utils.config.ConfigException;
 import com.eyeline.utils.config.xml.XmlConfig;
+import com.eyeline.utils.config.xml.XmlConfigSection;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.Services;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.BitrixApiProvider;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.handlers.command.*;
@@ -31,7 +32,7 @@ public class InitListener implements ServletContextListener {
   public void contextInitialized(ServletContextEvent servletContextEvent) {
     final File configDir = getConfigDir();
     initLog4j(configDir);
-    XmlConfig config = loadXmlConfig(configDir);
+    XmlConfigSection config = loadXmlConfig(configDir);
     String deployUrl = getDeployUrl(config);
     String pushUrl = getPushUrl(config);
     String pluginUrl = getPluginUrl(config);
@@ -59,15 +60,17 @@ public class InitListener implements ServletContextListener {
     return cfgDir;
   }
 
-  private XmlConfig loadXmlConfig(File configDir) {
+  private XmlConfigSection loadXmlConfig(File configDir) {
     final File cfgFile = new File(configDir, PROPERTIES_FILE_NAME);
-    XmlConfig cfg = new XmlConfig();
+    XmlConfigSection result;
     try {
+      XmlConfig cfg = new XmlConfig();
       cfg.load(cfgFile);
+      result = cfg.getSection("bitrix.plugin");
     } catch (ConfigException e) {
       throw new RuntimeException("Unable to load config.xml", e);
     }
-    return cfg;
+    return result;
   }
 
   private void initLog4j(File configDir) {
@@ -76,10 +79,10 @@ public class InitListener implements ServletContextListener {
     PropertyConfigurator.configureAndWatch(log4jProps.getAbsolutePath(), TimeUnit.MINUTES.toMillis(1));
   }
 
-  private void initPluginContext(XmlConfig config, String deployUrl, String pushUrl, String pluginUrl) {
+  private void initPluginContext(XmlConfigSection config, String deployUrl, String pushUrl, String pluginUrl) {
     try {
 
-      PluginContext.init(config.getSection("bitrix.plugin"), deployUrl, pushUrl, pluginUrl);
+      PluginContext.init(config, deployUrl, pushUrl, pluginUrl);
     }
     catch(Exception e) {
       e.printStackTrace();
@@ -116,7 +119,7 @@ public class InitListener implements ServletContextListener {
     CommandProcessor.addHandler(Command.STOP, new StopHandler(chatDAO, operatorDAO, messageDeliveryProvider, resourceBundleController, applicationDAO, queueDAO));
   }
 
-  private String getDeployUrl(XmlConfig config) {
+  private String getDeployUrl(XmlConfigSection config) {
     try {
       return config.getString("deploy.url");
     }
@@ -125,7 +128,7 @@ public class InitListener implements ServletContextListener {
     }
   }
 
-  private String getPushUrl(XmlConfig config) {
+  private String getPushUrl(XmlConfigSection config) {
     try {
       return config.getString("push.url");
     }
@@ -134,7 +137,7 @@ public class InitListener implements ServletContextListener {
     }
   }
 
-  private String getPluginUrl(XmlConfig config) {
+  private String getPluginUrl(XmlConfigSection config) {
     try {
       return config.getString("plugin.url");
     }

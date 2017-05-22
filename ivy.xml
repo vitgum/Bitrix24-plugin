@@ -22,6 +22,7 @@
     <!-- Servlets, WS-RS, DI and JPA validation implementations -->
     <dependency org="javax.servlet" name="javax.servlet-api" rev="3.1.0" conf="bitrix-plugin-prod->default"/>
     <dependency org="javax.ws.rs" name="javax.ws.rs-api" rev="2.0.1" conf="bitrix-plugin-prod->default"/>
+    <dependency org="javax.inject" name="javax.inject" rev="1" conf="bitrix-plugin-prod->default"/>
     <dependency org="javax.validation" name="validation-api" rev="1.1.0.Final" conf="bitrix-plugin-prod->default"/>
     <dependency org="javax.annotation" name="javax.annotation-api" rev="1.2" conf="bitrix-plugin-prod->default"/>
 
