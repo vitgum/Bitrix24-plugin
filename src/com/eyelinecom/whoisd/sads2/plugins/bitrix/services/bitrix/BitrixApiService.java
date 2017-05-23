@@ -99,11 +99,13 @@ public class BitrixApiService implements BitrixApiProvider {
     commands.put("stop", stopCommand);
   }
 
+  @Override
   public synchronized int createBot(String domain, String accessToken, String refreshToken) {
     ObjectNode response = bitrixApiClient.makeRequest(domain, BitrixRequestType.CREATE_BOT, accessToken, refreshToken, requestParamsFactory.getCreateBotJsonParams());
     return response.get("result").asInt();
   }
 
+  @Override
   public void deleteBot(Application application) {
     executeWithRateLimiting(application.getDomain(), () -> bitrixApiClient.makeRequest(
       application.getDomain(),
@@ -114,6 +116,7 @@ public class BitrixApiService implements BitrixApiProvider {
     );
   }
 
+  @Override
   public void addBotCommands(Application application) {
     Integer botId = application.getBotId();
     String domain = application.getDomain();
@@ -139,6 +142,7 @@ public class BitrixApiService implements BitrixApiProvider {
     }
   }
 
+  @Override
   public void sendMessage(Application application, String dialogId, String message) {
     executeWithRateLimiting(application.getDomain(), () -> bitrixApiClient.makeRequest(
       application.getDomain(),

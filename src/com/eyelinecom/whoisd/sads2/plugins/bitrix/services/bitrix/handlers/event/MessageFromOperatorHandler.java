@@ -45,6 +45,10 @@ public class MessageFromOperatorHandler extends CommonEventHandler implements Ev
     if (queue == null) {
       messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(application.getLanguage(),"user.start.command"));
     } else {
+
+      if (!ParamsExtractor.hasMessageText(parameters))//only text messages are supported
+        return;
+
       final String message = ParamsExtractor.getMessageWithEncoding(parameters);
       messageDeliveryProvider.sendMessageToUser(queue, message);
     }

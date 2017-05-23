@@ -46,6 +46,10 @@ public class MessageFromUserHandler extends CommonEventHandler implements EventH
     if (application == null)
       return;
 
+    final String eventType = ParamsExtractor.getEventType(parameters);
+    if (!"text".equals(eventType))//only text messages are supported
+      return;
+
     final String message = ParamsExtractor.getMessage(parameters);
     final String serviceId = ParamsExtractor.getServiceId(parameters);
 

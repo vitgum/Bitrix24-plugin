@@ -120,6 +120,14 @@ public class ParamsExtractor {
     }
   }
 
+  public static String getEventType(Map<String, String[]> parameters) {
+    return parameters.get("event.type")[0];
+  }
+
+  public static boolean hasMessageText(Map<String, String[]> parameters) {
+    return parameters.containsKey("data[PARAMS][MESSAGE]");
+  }
+
   public static String getMessage(Map<String, String[]> parameters) {
     return parameters.containsKey("event.text") ? parameters.get("event.text")[0] : parameters.get("data[PARAMS][MESSAGE]")[0];
   }

@@ -34,6 +34,7 @@ public class MessageDeliveryService implements MessageDeliveryProvider {
   private static final Logger logger = Logger.getLogger("BITRIX_PLUGIN");
   private static final Logger loggerMessagingSads = Logger.getLogger("BITRIX_PLUGIN_MESSAGING_WITH_SADS");
 
+  @Override
   public void sendMessageToUser(Queue queue, String message) {
     if (queue == null)
       return;
@@ -41,6 +42,7 @@ public class MessageDeliveryService implements MessageDeliveryProvider {
     pushMessageToUser(queue, message);
   }
 
+  @Override
   public void sendMessageToOperator(Operator operator, String message) {
     if (operator == null)
       return;
@@ -49,10 +51,12 @@ public class MessageDeliveryService implements MessageDeliveryProvider {
     pushMessageToBitrix(application, operator.getDialogId(), message);
   }
 
+  @Override
   public void sendMessageToChat(Application application, String dialogId, String message) {
     pushMessageToBitrix(application, dialogId, message);
   }
 
+  @Override
   public void sendMessageToAllChats(Application application, String message) {
     List<Chat> chats = chatDAO.find(application, Chat.Type.GROUP);
 
