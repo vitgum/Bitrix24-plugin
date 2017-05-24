@@ -103,10 +103,9 @@ public class MessageFromUserHandler extends CommonEventHandler implements EventH
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_OK);
 
-    final String protocol = ParamsExtractor.getProtocol(parameters);
-    final String lang = ParamsExtractor.getLanguage(parameters);
-    final String redirectBackPage = ParamsExtractor.getRedirectBackPageUrl(parameters);
-    final String xml = TemplateUtils.createEmptyPage(redirectBackPage, lang, protocol);
+    final String domain = ParamsExtractor.getDomain(parameters);
+    Application application = applicationDAO.find(domain);
+    final String xml = application == null ? generateErrorPage(parameters) : generateEmptyPage(parameters);
 
     if (loggerMessagingSads.isDebugEnabled())
       loggerMessagingSads.debug("USER_SEND_MESSAGE response:\n" + PrettyPrintUtils.toPrettyXml(xml));
@@ -118,6 +117,13 @@ public class MessageFromUserHandler extends CommonEventHandler implements EventH
     } catch (IOException ex) {
       loggerMessagingSads.error("Error during user start messaging event", ex);
     }
+  }
+
+  private String generateEmptyPage(Map<String, String[]> parameters) {
+    final String protocol = ParamsExtractor.getProtocol(parameters);
+    final String lang = ParamsExtractor.getLanguage(parameters);
+    final String redirectBackPage = ParamsExtractor.getRedirectBackPageUrl(parameters);
+    return TemplateUtils.createEmptyPage(redirectBackPage, lang, protocol);
   }
 
 }

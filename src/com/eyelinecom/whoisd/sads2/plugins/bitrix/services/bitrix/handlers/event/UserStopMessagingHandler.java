@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 
 /**
@@ -72,8 +73,10 @@ public class UserStopMessagingHandler extends CommonEventHandler implements Even
       try {
         final String domain = ParamsExtractor.getDomain(parameters);
         Application application = applicationDAO.find(domain);
-        if (application == null)
+        if (application == null) {
+          sendErrorMessage(parameters, response);
           return;
+        }
 
         final String userId = ParamsExtractor.getUserId(parameters);
         final String serviceId = ParamsExtractor.getServiceId(parameters);
@@ -112,6 +115,23 @@ public class UserStopMessagingHandler extends CommonEventHandler implements Even
       response.sendRedirect(redirectUrl);
     } catch (IOException ex) {
       loggerMessagingSads.error("Error during user stop messaging event", ex);
+    }
+  }
+
+  private void sendErrorMessage(Map<String, String[]> parameters, HttpServletResponse response) {
+    final String xml = generateErrorPage(parameters);
+
+    if (loggerMessagingSads.isDebugEnabled())
+      loggerMessagingSads.debug("USER_START_MESSAGING response:\n" + PrettyPrintUtils.toPrettyXml(xml));
+
+    response.setCharacterEncoding("UTF-8");
+    response.setStatus(HttpServletResponse.SC_OK);
+    try {
+      try (PrintWriter out = response.getWriter()) {
+        out.write(xml);
+      }
+    } catch (IOException ex) {
+      loggerMessagingSads.error("Error during sending error message", ex);
     }
   }
 

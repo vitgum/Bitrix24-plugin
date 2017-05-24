@@ -8,6 +8,7 @@ import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.OperatorDAO;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.TemplateUtils;
 
 import java.util.Map;
 
@@ -68,5 +69,10 @@ public class CommonEventHandler {
 
   protected String getLocalizedMessage(String lang, String key, String ... args) {
     return resourceBundleController.getMessage(lang, key, args);
+  }
+
+  protected String generateErrorPage(Map<String, String[]> parameters) {
+    final String lang = ParamsExtractor.getLanguage(parameters);
+    return TemplateUtils.createErrorPage(getLocalizedMessage(lang, "error.service.not.unavailable"), getLocalizedMessage(lang, "start.again"));
   }
 }

@@ -55,6 +55,25 @@ public class UserStartMessagingHandler extends CommonEventHandler implements Eve
     if (loggerMessagingSads.isDebugEnabled())
       loggerMessagingSads.debug("USER_START_MESSAGING request:\n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n");
 
+    final String domain = ParamsExtractor.getDomain(parameters);
+    Application application = applicationDAO.find(domain);
+    final String xml = application == null ? generateErrorPage(parameters) : generateBasicPage(parameters);
+
+    if (loggerMessagingSads.isDebugEnabled())
+      loggerMessagingSads.debug("USER_START_MESSAGING response:\n" + PrettyPrintUtils.toPrettyXml(xml));
+
+    response.setCharacterEncoding("UTF-8");
+    response.setStatus(HttpServletResponse.SC_OK);
+    try {
+      try (PrintWriter out = response.getWriter()) {
+        out.write(xml);
+      }
+    } catch (IOException ex) {
+      loggerMessagingSads.error("Error during user start messaging event", ex);
+    }
+  }
+
+  private String generateBasicPage(Map<String, String[]> parameters) {
     final String deployUrl = PluginContext.getInstance().getPluginUrl();
     final String domain = ParamsExtractor.getDomain(parameters);
     final String userId = ParamsExtractor.getUserId(parameters);
@@ -71,19 +90,6 @@ public class UserStartMessagingHandler extends CommonEventHandler implements Eve
     final String inputTitle = getLocalizedMessage(lang, "init.message.for.user");
     final String inputUrl = TemplateUtils.createInputUrl(deployUrl, domain, lang, encodedAndEscapedRedirectBackPageUrl);
     final String escapedInputUrl = EncodingUtils.escape(inputUrl);
-    final String xml = TemplateUtils.createBasicPage(inputTitle, escapedInputUrl, escapedRedirectBackPageUrl, lang);
-
-    if (loggerMessagingSads.isDebugEnabled())
-      loggerMessagingSads.debug("USER_START_MESSAGING response:\n" + PrettyPrintUtils.toPrettyXml(xml));
-
-    response.setCharacterEncoding("UTF-8");
-    response.setStatus(HttpServletResponse.SC_OK);
-    try {
-      try (PrintWriter out = response.getWriter()) {
-        out.write(xml);
-      }
-    } catch (IOException ex) {
-      loggerMessagingSads.error("Error during user start messaging event", ex);
-    }
+    return TemplateUtils.createBasicPage(inputTitle, escapedInputUrl, escapedRedirectBackPageUrl, lang);
   }
 }

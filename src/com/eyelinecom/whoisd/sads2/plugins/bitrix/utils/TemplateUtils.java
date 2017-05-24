@@ -34,9 +34,18 @@ public class TemplateUtils {
         "<link accesskey=\"2\" pageId=\"%s\">%s</link>" +
       "</navigation>" +
     "</page>";
+  private static final String ERROR_PAGE = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+    "<page version=\"2.0\">" +
+      "<div>" +
+        "%s" +
+      "</div>" +
+    "<navigation>" +
+      "<link accesskey=\"1\" pageId=\"http://plugins.miniapps.run/invalidate-session\">%s</link>" +
+    "</navigation>" +
+    "</page>";
 
   private static final String PUSH_URL = "%s?service=%s&user_id=%s&protocol=%s&scenario=xmlpush&document=%s";
-  private static final String INVALIDATE_SESSION_RUL = "http://plugins.miniapps.run/invalidate-session?success_url=%s";
+  private static final String INVALIDATE_SESSION_URL = "http://plugins.miniapps.run/invalidate-session?success_url=%s";
 
   private static final char HIDDEN_CHAR = '\u2063';
   public static final String BACK_BUTTON_EN = HIDDEN_CHAR + "Back";
@@ -69,6 +78,10 @@ public class TemplateUtils {
   }
 
   public static String createInvalidateSessionUrl(String successUrl) {
-    return String.format(INVALIDATE_SESSION_RUL, successUrl);
+    return String.format(INVALIDATE_SESSION_URL, successUrl);
+  }
+
+  public static String createErrorPage(String message, String toStartPageButton) {
+    return String.format(ERROR_PAGE, message, toStartPageButton);
   }
 }
