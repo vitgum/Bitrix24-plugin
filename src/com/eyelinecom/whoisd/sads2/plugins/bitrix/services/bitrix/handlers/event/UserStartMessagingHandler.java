@@ -55,9 +55,8 @@ public class UserStartMessagingHandler extends CommonEventHandler implements Eve
     if (loggerMessagingSads.isDebugEnabled())
       loggerMessagingSads.debug("USER_START_MESSAGING request:\n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n");
 
-    final String domain = ParamsExtractor.getDomain(parameters);
-    Application application = applicationDAO.find(domain);
-    final String xml = application == null ? generateErrorPage(parameters) : generateBasicPage(parameters);
+    final String protocol = ParamsExtractor.getProtocol(parameters);
+    final String xml = "ussd".equals(protocol) ? generateUssdNotSupportedPage(parameters) : generateSupportedProtocolPage(parameters);
 
     if (loggerMessagingSads.isDebugEnabled())
       loggerMessagingSads.debug("USER_START_MESSAGING response:\n" + PrettyPrintUtils.toPrettyXml(xml));
@@ -91,5 +90,16 @@ public class UserStartMessagingHandler extends CommonEventHandler implements Eve
     final String inputUrl = TemplateUtils.createInputUrl(deployUrl, domain, lang, encodedAndEscapedRedirectBackPageUrl);
     final String escapedInputUrl = EncodingUtils.escape(inputUrl);
     return TemplateUtils.createBasicPage(inputTitle, escapedInputUrl, escapedRedirectBackPageUrl, lang);
+  }
+
+  private String generateSupportedProtocolPage(Map<String, String[]> parameters) {
+    final String domain = ParamsExtractor.getDomain(parameters);
+    Application application = applicationDAO.find(domain);
+    return application == null ? generateErrorPage(parameters) : generateBasicPage(parameters);
+  }
+
+  private String generateUssdNotSupportedPage(Map<String, String[]> parameters) {
+    final String lang = ParamsExtractor.getLanguage(parameters);
+    return TemplateUtils.createErrorPage(getLocalizedMessage(lang, "error.ussd.not.supported"), getLocalizedMessage(lang, "start.again"));
   }
 }
