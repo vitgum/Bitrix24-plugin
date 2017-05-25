@@ -1,6 +1,7 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 
@@ -109,6 +110,32 @@ class RequestParamsFactory {
       return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
     } catch (Exception ex) {
       String errorMsg = "Error during creating add command request";
+      logger.error(errorMsg, ex);
+      throw new IllegalStateException(errorMsg);
+    }
+  }
+
+  String getSendImageJsonParams(Integer botId, String dialogId, String imageUrl) {
+    try {
+      ObjectNode json = mapper.createObjectNode();
+
+      ObjectNode link = mapper.createObjectNode();
+      link.put("LINK", imageUrl);
+
+      ObjectNode image = mapper.createObjectNode();
+      image.set("IMAGE", link);
+
+      ArrayNode attachment = mapper.createArrayNode();
+      attachment.add(image);
+
+      json.put("BOT_ID", botId);
+      json.put("DIALOG_ID", dialogId);
+      json.put("MESSAGE", "TODO");
+      json.set("ATTACH", attachment);
+
+      return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
+    } catch (Exception ex) {
+      String errorMsg = "Error during creating send immage to Bitrix request";
       logger.error(errorMsg, ex);
       throw new IllegalStateException(errorMsg);
     }

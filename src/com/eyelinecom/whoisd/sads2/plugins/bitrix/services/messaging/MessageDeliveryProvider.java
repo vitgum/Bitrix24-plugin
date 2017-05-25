@@ -10,6 +10,7 @@ import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.queue.Queue;
 public interface MessageDeliveryProvider {
   void sendMessageToUser(Queue queue, String message);
   void sendMessageToOperator(Operator operator, String message);
+  void sendImageToOperator(Operator operator, String imageUrl);
   void sendMessageToChat(Application application, String dialogId, String message);
   void sendMessageToAllChats(Application application, String message);
 }

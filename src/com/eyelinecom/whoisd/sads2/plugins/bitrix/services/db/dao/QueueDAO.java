@@ -2,6 +2,7 @@ package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao;
 
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.message.IncomeMessage;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.message.MessageType;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.operator.Operator;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.queue.Queue;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.queue.QueueType;
@@ -27,11 +28,22 @@ import java.util.stream.Collectors;
     return db.tx(s -> (Queue) QueueQuery.byUser(application, user, serviceId, s).uniqueResult());
   }
 
-  public void storeMessage(Queue queue, String message) {
+  public void storeMessage(Queue queue, MessageType type, String data) {
     db.vtx(s -> {
       IncomeMessage incomeMessage = new IncomeMessage();
       incomeMessage.setQueue(queue);
-      incomeMessage.setText(message);
+
+      switch (type) {
+        case TEXT:
+          incomeMessage.setText(data);
+          break;
+        case IMAGE:
+          incomeMessage.setImageUrl(data);
+          break;
+        default:
+          throw new IllegalArgumentException("Unkown message type: " + type);
+      }
+
       s.save(incomeMessage);
     });
   }

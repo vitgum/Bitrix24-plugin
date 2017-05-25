@@ -147,7 +147,7 @@ class MessageFromUserHandlerTest extends DBTestBase {
     ModelStateChecker.assertExistsOnlyOneUser(db, user)
     ModelStateChecker.assertExistsOnlyOneQueue(db, awaiting)
     Queue queue = ModelStateChecker.assertAwaitingQueueWasCreated(db, application, user)
-    ModelStateChecker.assertMessageWasStored(db , queue, ParamsExtractor.getMessage(MESSAGE_FROM_USER))
+    ModelStateChecker.assertMessageWasStored(db , queue, ParamsExtractor.getMessageText(MESSAGE_FROM_USER))
     messageDeliveryProviderMock.verify(messageDeliveryProviderDelegate)
   }
 
@@ -166,7 +166,7 @@ class MessageFromUserHandlerTest extends DBTestBase {
     Queue processing = InitHelper.preInstallProcessingQueue(db, application, user, operator)
     MockFor messageDeliveryProviderMock = new MockFor(MessageDeliveryProvider)
     messageDeliveryProviderMock.demand.sendMessageToOperator(1) { Operator opp, String msg ->
-      assertEquals ParamsExtractor.getMessage(MESSAGE_FROM_USER), msg
+      assertEquals ParamsExtractor.getMessageText(MESSAGE_FROM_USER), msg
     }
     MessageDeliveryProvider messageDeliveryProviderDelegate = messageDeliveryProviderMock.proxyDelegateInstance()
 

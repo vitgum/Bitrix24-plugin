@@ -184,7 +184,7 @@ class MessageFromOperatorHandlerTest extends DBTestBase {
     Queue processing = InitHelper.preInstallProcessingQueue(db, application, user, operator)
     MockFor messageDeliveryProviderMock = new MockFor(MessageDeliveryProvider)
     messageDeliveryProviderMock.demand.sendMessageToUser(1) { Queue que, String msg ->
-      final String message = ParamsExtractor.getMessageWithEncoding(MESSAGE_FROM_OPERATOR_PRIVATE_CHAT)
+      final String message = ParamsExtractor.getMessageTextWithEncoding(MESSAGE_FROM_OPERATOR_PRIVATE_CHAT)
       assertEquals message, msg
     }
     MessageDeliveryProvider messageDeliveryProviderDelegate = messageDeliveryProviderMock.proxyDelegateInstance()

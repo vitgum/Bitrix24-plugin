@@ -49,7 +49,7 @@ public class MessageFromOperatorHandler extends CommonEventHandler implements Ev
       if (!ParamsExtractor.hasMessageText(parameters))//only text messages are supported
         return;
 
-      final String message = ParamsExtractor.getMessageWithEncoding(parameters);
+      final String message = ParamsExtractor.getMessageTextWithEncoding(parameters);
       messageDeliveryProvider.sendMessageToUser(queue, message);
     }
   }

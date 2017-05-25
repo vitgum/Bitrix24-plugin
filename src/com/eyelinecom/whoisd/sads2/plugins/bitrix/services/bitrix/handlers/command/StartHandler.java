@@ -64,6 +64,7 @@ public class StartHandler extends CommonEventHandler implements CommandHandler {
         Integer queueId = firstAwaiting.getId();
         queueDAO.moveToProcessingQueue(queueId, operator);
 
+        //TODO: process images and texts separately
         String userMessages = queueDAO.getMessages(queueId);
         messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang, "message.from", firstAwaiting.getProtocol()) + "\n" + userMessages);
 

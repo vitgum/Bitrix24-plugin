@@ -1,6 +1,7 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.handlers.event;
 
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.message.MessageType;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.operator.Operator;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.queue.Queue;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.queue.QueueType;
@@ -46,25 +47,25 @@ public class MessageFromUserHandler extends CommonEventHandler implements EventH
     if (application == null)
       return;
 
-    final String eventType = ParamsExtractor.getEventType(parameters);
-    if (!"text".equals(eventType))//only text messages are supported
+    final MessageType messageType = ParamsExtractor.extractMessageType(parameters);
+    if (messageType == null)//only text messages and images are supported
       return;
 
-    final String message = ParamsExtractor.getMessage(parameters);
+    final String data = messageType == MessageType.TEXT ? ParamsExtractor.getMessageText(parameters) : ParamsExtractor.getImageUrl(parameters);
     final String serviceId = ParamsExtractor.getServiceId(parameters);
 
     User user = getOrCreateUser(parameters);
     Queue queue = queueDAO.find(application, user, serviceId);
 
     if (queue == null) {
-      processNewUser(parameters, application, user, message, serviceId);
+      processNewUser(parameters, application, user, messageType, data, serviceId);
     }
     else if (queue.getType() == QueueType.AWAITING) {
-      queueDAO.storeMessage(queue, message);
+      queueDAO.storeMessage(queue, messageType, data);
     }
     else {
       Operator operator = queueDAO.getOperator(application, user, serviceId);
-      messageDeliveryProvider.sendMessageToOperator(operator, message);
+      messageDeliveryProvider.sendMessageToOperator(operator, data);
     }
   }
 
@@ -78,12 +79,12 @@ public class MessageFromUserHandler extends CommonEventHandler implements EventH
     return user;
   }
 
-  private void processNewUser(Map<String, String[]> parameters, Application application, User user, String message, String serviceId) {
+  private void processNewUser(Map<String, String[]> parameters, Application application, User user, MessageType messageType, String data, String serviceId) {
     final String protocol = ParamsExtractor.getProtocol(parameters);
     final String lang = ParamsExtractor.getLanguage(parameters);
     final String redirectBackPage = ParamsExtractor.getRedirectBackPageUrl(parameters);
     Queue queue = queueDAO.addToAwaitingQueue(application, user, serviceId, protocol, redirectBackPage, lang);
-    queueDAO.storeMessage(queue, message);
+    queueDAO.storeMessage(queue, messageType, data);
 
     final String appLang = application.getLanguage();
     UserCounters counters = queueDAO.getUserCounters(application);

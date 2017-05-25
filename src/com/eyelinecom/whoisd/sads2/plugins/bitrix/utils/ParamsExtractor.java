@@ -1,6 +1,7 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.utils;
 
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.chat.Chat;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.message.MessageType;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.model.Command;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.model.Event;
 import org.apache.log4j.Logger;
@@ -121,20 +122,59 @@ public class ParamsExtractor {
   }
 
   public static String getEventType(Map<String, String[]> parameters) {
-    return parameters.get("event.type")[0];
+    try {
+      return parameters.get("event.type")[0];
+    } catch (Exception ex) {
+
+      logger.error("Unable to extract event type", ex);
+      return null;
+    }
+  }
+
+  public static String getMediaType(Map<String, String[]> parameters) {
+    try {
+      return parameters.get("event.media_type")[0];
+    } catch (Exception ex) {
+
+      logger.error("Unable to extract event media type", ex);
+      return null;
+    }
+  }
+
+  public static MessageType extractMessageType(Map<String, String[]> parameters) {
+    final String eventType = ParamsExtractor.getEventType(parameters);
+
+    if ("text".equals(eventType))
+      return MessageType.TEXT;
+
+    if ("file".equals(eventType) && "photo".equals(ParamsExtractor.getMediaType(parameters))) {
+      return MessageType.IMAGE;
+    }
+
+    return null;
   }
 
   public static boolean hasMessageText(Map<String, String[]> parameters) {
     return parameters.containsKey("data[PARAMS][MESSAGE]");
   }
 
-  public static String getMessage(Map<String, String[]> parameters) {
+  public static String getMessageText(Map<String, String[]> parameters) {
     return parameters.containsKey("event.text") ? parameters.get("event.text")[0] : parameters.get("data[PARAMS][MESSAGE]")[0];
   }
 
-  public static String getMessageWithEncoding(Map<String, String[]> parameters) {
+  public static String getImageUrl(Map<String, String[]> parameters) {
     try {
-      return EncodingUtils.convert("ISO-8859-1","UTF-8", getMessage(parameters));
+      return parameters.get("event.url")[0];
+    } catch (Exception ex) {
+
+      logger.error("Unable to extract image url", ex);
+      return null;
+    }
+  }
+
+  public static String getMessageTextWithEncoding(Map<String, String[]> parameters) {
+    try {
+      return EncodingUtils.convert("ISO-8859-1","UTF-8", getMessageText(parameters));
     } catch (Exception e) {
       throw new IllegalArgumentException("Unable extract message");
     }
