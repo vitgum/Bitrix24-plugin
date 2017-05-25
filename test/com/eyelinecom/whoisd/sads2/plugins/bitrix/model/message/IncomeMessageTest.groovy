@@ -13,6 +13,7 @@ class IncomeMessageTest extends DBTestBase {
   static IncomeMessage createIncomeMessage(Map overrides = [:]) {
     def defaultFields = [
       text : 'hello',
+      type : MessageType.TEXT,
       queue : QueueTest.createCorrectQueue()
     ]
     return new IncomeMessage(defaultFields + overrides)
@@ -40,6 +41,8 @@ class IncomeMessageTest extends DBTestBase {
 
   static void assertIncomeMessagesEquals(IncomeMessage expected, IncomeMessage actual) {
     assertEquals expected.text, actual.text
+    assertEquals expected.type, actual.type
+    assertEquals expected.imageUrl, actual.imageUrl
     QueueTest.assertQueuesEquals expected.queue, actual.queue
   }
 }

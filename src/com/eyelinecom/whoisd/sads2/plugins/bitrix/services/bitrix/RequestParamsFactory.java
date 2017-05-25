@@ -12,8 +12,6 @@ class RequestParamsFactory {
   private final static Logger logger = Logger.getLogger("BITRIX_PLUGIN");
 
   private static final String NO = "N";
-  private static final String SCOPE = "imbot";
-  private static final String GRANT_TYPE = "refresh_token";
 
   private final ObjectMapper mapper;
   private final String botName;
@@ -115,7 +113,7 @@ class RequestParamsFactory {
     }
   }
 
-  String getSendImageJsonParams(Integer botId, String dialogId, String imageUrl) {
+  String getSendImageJsonParams(Integer botId, String dialogId, String title, String imageUrl) {
     try {
       ObjectNode json = mapper.createObjectNode();
 
@@ -130,7 +128,7 @@ class RequestParamsFactory {
 
       json.put("BOT_ID", botId);
       json.put("DIALOG_ID", dialogId);
-      json.put("MESSAGE", "TODO");
+      json.put("MESSAGE", title);
       json.set("ATTACH", attachment);
 
       return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);

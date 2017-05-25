@@ -10,5 +10,5 @@ public interface BitrixApiProvider {
   void deleteBot(Application application);
   void addBotCommands(Application application);
   void sendMessage(Application application, String dialogId, String message);
-  void sendImage(Application application, String dialogId, String imageUrl);
+  void sendImage(Application application, String dialogId, String title, String imageUrl);
 }

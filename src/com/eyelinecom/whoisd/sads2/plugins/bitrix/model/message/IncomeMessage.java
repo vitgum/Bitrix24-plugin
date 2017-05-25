@@ -27,7 +27,6 @@ public class IncomeMessage {
   private String text;
 
   @Column(name = "image_url", nullable = true, unique = false, columnDefinition = "TEXT", length = 65535)
-  @NotNull(message = "Image url is null")
   @Size(min = 1, max = 65535, message = "Image url length should be from 1 to 65535 characters")
   private String imageUrl;
 

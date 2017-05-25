@@ -2,6 +2,8 @@ package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.handlers.comm
 
 
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.message.IncomeMessage;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.message.MessageType;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.operator.Operator;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.queue.Queue;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.handlers.CommandHandler;
@@ -15,6 +17,7 @@ import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBun
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.ParamsExtractor;
 import org.apache.log4j.Logger;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -64,10 +67,11 @@ public class StartHandler extends CommonEventHandler implements CommandHandler {
         Integer queueId = firstAwaiting.getId();
         queueDAO.moveToProcessingQueue(queueId, operator);
 
-        //TODO: process images and texts separately
-        String userMessages = queueDAO.getMessages(queueId);
-        messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang, "message.from", firstAwaiting.getProtocol()) + "\n" + userMessages);
-
+        List<IncomeMessage> userMessages = queueDAO.getMessages(queueId);
+        messageDeliveryProvider.sendMessageToOperator(operator, getLocalizedMessage(appLang, "message.from", firstAwaiting.getProtocol()) + "\n");
+        for (IncomeMessage m : userMessages) {
+          sendMessageToOperator(operator, m, appLang);
+        }
         queueDAO.deleteMessages(queueId);
 
         String operatorFullName = ParamsExtractor.getOperatorFullNameWithEncoding(parameters);
@@ -77,6 +81,20 @@ public class StartHandler extends CommonEventHandler implements CommandHandler {
 
         messageDeliveryProvider.sendMessageToUser(firstAwaiting, getLocalizedMessage(firstAwaiting.getLanguage(), "operator.greetings", operatorFullName));
       }
+    }
+  }
+
+  private void sendMessageToOperator(Operator operator, IncomeMessage incomeMessage, String appLang) {
+    MessageType messageType = incomeMessage.getType();
+    switch (messageType) {
+      case TEXT:
+        messageDeliveryProvider.sendMessageToOperator(operator, incomeMessage.getText());
+        break;
+      case IMAGE:
+        messageDeliveryProvider.sendImageToOperator(operator, getLocalizedMessage(appLang, "image.from.user"), incomeMessage.getImageUrl());
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown message type: " + messageType);
     }
   }
 }

@@ -154,13 +154,13 @@ public class BitrixApiService implements BitrixApiProvider {
   }
 
   @Override
-  public void sendImage(Application application, String dialogId, String imageUrl) {
+  public void sendImage(Application application, String dialogId, String title, String imageUrl) {
     executeWithRateLimiting(application.getDomain(), () -> bitrixApiClient.makeRequest(
       application.getDomain(),
       BitrixRequestType.SEND_MESSAGE_TO_CHAT,
       application.getAccessToken(),
       application.getRefreshToken(),
-      requestParamsFactory.getSendImageJsonParams(application.getBotId(), dialogId, imageUrl))
+      requestParamsFactory.getSendImageJsonParams(application.getBotId(), dialogId, title, imageUrl))
     );
   }
 

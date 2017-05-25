@@ -52,12 +52,12 @@ public class MessageDeliveryService implements MessageDeliveryProvider {
   }
 
   @Override
-  public void sendImageToOperator(Operator operator, String imageUrl) {
+  public void sendImageToOperator(Operator operator, String title, String imageUrl) {
     if (operator == null)
       return;
 
     final Application application = operator.getApplication();
-    pushImageToBitrix(application, operator.getDialogId(), imageUrl);
+    pushImageToBitrix(application, operator.getDialogId(), title, imageUrl);
   }
 
   @Override
@@ -78,8 +78,8 @@ public class MessageDeliveryService implements MessageDeliveryProvider {
     bitrixApiProvider.sendMessage(application, dialogId, message);
   }
 
-  private void pushImageToBitrix(Application application, String dialogId, String imageUrl) {
-    bitrixApiProvider.sendImage(application, dialogId, imageUrl);
+  private void pushImageToBitrix(Application application, String dialogId, String title, String imageUrl) {
+    bitrixApiProvider.sendImage(application, dialogId, title, imageUrl);
   }
 
   private static void pushMessageToUser(Queue queue, String message) {

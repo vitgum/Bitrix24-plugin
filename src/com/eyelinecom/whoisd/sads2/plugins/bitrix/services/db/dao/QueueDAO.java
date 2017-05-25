@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
     db.vtx(s -> {
       IncomeMessage incomeMessage = new IncomeMessage();
       incomeMessage.setQueue(queue);
+      incomeMessage.setType(type);
 
       switch (type) {
         case TEXT:
@@ -121,11 +122,12 @@ import java.util.stream.Collectors;
     });
   }
 
-  public String getMessages(Integer queueId) {
+  public List<IncomeMessage> getMessages(Integer queueId) {
     return db.tx(s -> {
       Queue queue = (Queue) QueueQuery.byId(queueId, s).uniqueResult();
       List<IncomeMessage> list = queue.getIncomeMessages();
-      return list.stream().map(IncomeMessage::getText).collect(Collectors.joining("\n"));
+      list.size();
+      return list;
     });
   }
 

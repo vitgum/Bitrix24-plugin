@@ -65,7 +65,7 @@ public class MessageFromUserHandler extends CommonEventHandler implements EventH
     }
     else {
       Operator operator = queueDAO.getOperator(application, user, serviceId);
-      messageDeliveryProvider.sendMessageToOperator(operator, data);
+      sendMessageToOperator(operator, messageType, data, application.getLanguage());
     }
   }
 
@@ -125,6 +125,19 @@ public class MessageFromUserHandler extends CommonEventHandler implements EventH
     final String lang = ParamsExtractor.getLanguage(parameters);
     final String redirectBackPage = ParamsExtractor.getRedirectBackPageUrl(parameters);
     return TemplateUtils.createEmptyPage(redirectBackPage, lang, protocol);
+  }
+
+  private void sendMessageToOperator(Operator operator, MessageType messageType, String data, String appLang) {
+    switch (messageType) {
+      case TEXT:
+        messageDeliveryProvider.sendMessageToOperator(operator, data);
+        break;
+      case IMAGE:
+        messageDeliveryProvider.sendImageToOperator(operator, getLocalizedMessage(appLang,"image.from.user"), data);
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown message type: " + messageType);
+    }
   }
 
 }

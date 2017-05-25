@@ -166,9 +166,7 @@ class StartHandlerTest extends DBTestBase {
     Operator operator = InitHelper.preInstallOperator(db, application)
     Queue awaiting = InitHelper.preInstallAwaitingQueue(db, application, user, "SOME_TEXT")
     MockFor messageDeliveryProviderMock = new MockFor(MessageDeliveryProvider)
-    messageDeliveryProviderMock.demand.sendMessageToOperator(1) { Operator opp, String msg ->
-      String messageToOperator = LocalizationHelper.getLocalizedMessage(application.getLanguage(), "message.from", awaiting.protocol) + "\nSOME_TEXT"
-      assertEquals messageToOperator, msg
+    messageDeliveryProviderMock.demand.sendMessageToOperator(2) { Operator opp, String msg ->
     }
     messageDeliveryProviderMock.demand.sendMessageToUser(1) { Queue que, String msg ->
       String operatorFullName = ParamsExtractor.getOperatorFullNameWithEncoding(START_COMMAND_PRIVATE_CHAT)
