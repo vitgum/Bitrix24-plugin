@@ -23,10 +23,15 @@
     </facet>
     <facet type="hibernate" name="Hibernate">
       <configuration>
-        <datasource-map />
+        <datasource-map>
+          <unit-entry name=".build:classes:bitrix:com:eyelinecom:whoisd:sads2:plugins:bitrix:model:model.cfg.xml" />
+          <unit-entry name="com:eyelinecom:whoisd:sads2:plugins:bitrix:model:model.cfg.xml" />
+          <unit-entry name="com:eyelinecom:whoisd:sads2:plugins:bitrix:services:db:hibernate-model-test.cfg.xml" />
+        </datasource-map>
         <naming-strategy-map />
         <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/.build/classes/bitrix/com/eyelinecom/whoisd/sads2/plugins/bitrix/model/model.cfg.xml" />
         <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/src/com/eyelinecom/whoisd/sads2/plugins/bitrix/model/model.cfg.xml" />
+        <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/src/com/eyelinecom/whoisd/sads2/plugins/bitrix/services/db/hibernate.cfg.xml" />
         <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/test/com/eyelinecom/whoisd/sads2/plugins/bitrix/services/db/hibernate-model-test.cfg.xml" />
       </configuration>
     </facet>

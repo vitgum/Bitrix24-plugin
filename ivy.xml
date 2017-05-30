@@ -76,7 +76,7 @@
     <!--4 tests-->
     <dependency org="org.hamcrest" name="hamcrest-core" rev="1.3" conf="bitrix-plugin-prod->default"/>
     <dependency org="net.sf.ehcache" name="ehcache-core" rev="2.4.3" conf="bitrix-plugin-prod->default"/>
-    <dependency org="org.slf4j" name="slf4j-api" rev="1.6.1" conf="bitrix-plugin-dev->default"/>
+    <dependency org="org.slf4j" name="slf4j-api" rev="1.7.25" conf="bitrix-plugin-prod->default"/>
     <dependency org="javax.el" name="javax.el-api" rev="3.0.0" conf="bitrix-plugin-dev->default"/>
 
     <!-- HSQL -->

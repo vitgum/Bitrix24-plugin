@@ -45,7 +45,8 @@ public class Services {
   private DBService initDBService(XmlConfigSection config) throws ServicesException {
     try {
       Properties hibernateProperties = config.getSection("db").toProperties(".");
-      return new DBService(hibernateProperties);
+      String hibernateAddCfg = "/" + DBService.class.getPackage().getName().replace('.', '/') + "/hibernate.cfg.xml";
+      return new DBService(hibernateProperties, hibernateAddCfg);
     }
     catch(ConfigException e) {
       throw new ServicesException("Error during DBService initialization.", e);

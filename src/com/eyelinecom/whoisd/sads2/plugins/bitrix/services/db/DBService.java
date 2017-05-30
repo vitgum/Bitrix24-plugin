@@ -1,6 +1,5 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db;
 
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.app.Application;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -16,8 +15,12 @@ public class DBService
   private SessionFactory sf;
 
   @SuppressWarnings("deprecation")
-  public DBService(Properties hibernateProperties) {
-    Configuration conf = new Configuration().configure(Application.class.getResource("../model.cfg.xml"));
+  public DBService(Properties hibernateProperties,  String hibernateAddCfg) {
+    Configuration conf = new Configuration().configure("/com/eyelinecom/whoisd/sads2/plugins/bitrix/model/model.cfg.xml");
+
+    if (hibernateAddCfg != null)
+      conf.configure(hibernateAddCfg);
+
     conf.addProperties(hibernateProperties);
     sf = conf.buildSessionFactory();
   }
