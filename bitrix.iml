@@ -27,6 +27,7 @@
           <unit-entry name=".build:classes:bitrix:com:eyelinecom:whoisd:sads2:plugins:bitrix:model:model.cfg.xml" />
           <unit-entry name="com:eyelinecom:whoisd:sads2:plugins:bitrix:model:model.cfg.xml" />
           <unit-entry name="com:eyelinecom:whoisd:sads2:plugins:bitrix:services:db:hibernate-model-test.cfg.xml" />
+          <unit-entry name="com:eyelinecom:whoisd:sads2:plugins:bitrix:services:db:hibernate.cfg.xml" />
         </datasource-map>
         <naming-strategy-map />
         <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/.build/classes/bitrix/com/eyelinecom/whoisd/sads2/plugins/bitrix/model/model.cfg.xml" />
