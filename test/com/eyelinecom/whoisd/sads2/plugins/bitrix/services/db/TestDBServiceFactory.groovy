@@ -16,8 +16,7 @@ class TestDBServiceFactory {
     if (hiberProps == null) {
       hiberProps = load("test_db.properties")
     }
-
-    final DBService db = new DBService(hiberProps)
+    final DBService db = new DBService(hiberProps, "/com/eyelinecom/whoisd/sads2/plugins/bitrix/services/db/hibernate-model-test.cfg.xml")
 
     createEmptyDB(hiberProps)
 
