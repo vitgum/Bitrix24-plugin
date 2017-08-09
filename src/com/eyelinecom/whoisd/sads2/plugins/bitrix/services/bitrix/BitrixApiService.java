@@ -56,8 +56,8 @@ public class BitrixApiService implements BitrixApiProvider {
     NotificationDaemon notificationDaemon = new NotificationDaemon();
     RenewRefreshTokensDaemon renewRefreshTokensDaemon = new RenewRefreshTokensDaemon();
 
-    scheduledExecutorService.scheduleWithFixedDelay(notificationDaemon, 60L, notificationTimeoutInSeconds, TimeUnit.SECONDS);
-    scheduledExecutorService.scheduleWithFixedDelay(renewRefreshTokensDaemon, 1L, 60L, TimeUnit.MINUTES);
+    scheduledExecutorService.scheduleWithFixedDelay(notificationDaemon, 300L, notificationTimeoutInSeconds, TimeUnit.SECONDS);
+    scheduledExecutorService.scheduleWithFixedDelay(renewRefreshTokensDaemon, 5L, 60L, TimeUnit.MINUTES);
 
     initCommands();
   }

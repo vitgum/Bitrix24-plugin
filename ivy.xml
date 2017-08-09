@@ -60,8 +60,6 @@
     <dependency org="org.jboss.logging" name="jboss-logging" rev="3.2.1.Final" conf="bitrix-plugin-prod->default"/>
     <dependency org="javax.transaction" name="javax.transaction-api" rev="1.2" conf="bitrix-plugin-prod->default"/>
     <dependency org="org.hibernate" name="hibernate-envers" rev="4.3.8.Final" conf="bitrix-plugin-prod->default" transitive="false"/>
-    <dependency org="org.hibernate" name="hibernate-ehcache" rev="4.3.8.Final" conf="bitrix-plugin-prod->default"/>
-    <dependency org="org.hibernate" name="hibernate-c3p0" rev="4.3.8.Final" conf="bitrix-plugin-prod->default" />
     <dependency org="com.mchange" name="c3p0" rev="0.9.2.1" conf="bitrix-plugin-prod->default" />
     <dependency org="com.mchange" name="mchange-commons-java" rev="0.2.3.4" conf="bitrix-plugin-prod->default"/>
     <dependency org="com.fasterxml" name="classmate" rev="1.1.0" conf="bitrix-plugin-prod->default"/>
