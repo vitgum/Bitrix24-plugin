@@ -1,6 +1,7 @@
 package com.eyelinecom.whoisd.sads2.plugins.bitrix.api;
 
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.model.BitrixRequestType;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
@@ -19,7 +20,7 @@ import javax.ws.rs.core.Response;
  */
 public class BitrixApiClient {
   private static final Logger logger = Logger.getLogger("BITRIX_API_CLIENT");
-  private static final ObjectMapper mapper = new ObjectMapper();
+  private static final ObjectMapper MAPPER = new ObjectMapper();
   private static final String GRANT_TYPE = "refresh_token";
   private static final String SCOPE = "imbot";
   private final Client client;
@@ -94,9 +95,12 @@ public class BitrixApiClient {
     final String endpoint = getRefreshTokenEndpoint(domain) + queryParams;
     ObjectNode response = makeRequest(endpoint, "{}");
 
-    if (isError(response))
-      throw new IllegalStateException("Unable to refresh token for: " + domain);
-
+    try {
+      if (isError(response))
+        throw new IllegalStateException("Unable to refresh token for: " + domain + ". Response: " + MAPPER.writeValueAsString(response));
+    } catch (JsonProcessingException ex) {
+      throw new IllegalStateException("Unable to refresh token for: " + domain, ex);
+    }
     final String newAccessToken = response.get("access_token").asText();
     final String newRefreshToken = response.get("refresh_token").asText();
 
@@ -131,7 +135,7 @@ public class BitrixApiClient {
       throw new IllegalStateException("null json object");
 
     try {
-      return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
+      return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(json);
     } catch (Exception ex) {
       String errorMsg = "Error parsing json";
       logger.error(errorMsg, ex);
