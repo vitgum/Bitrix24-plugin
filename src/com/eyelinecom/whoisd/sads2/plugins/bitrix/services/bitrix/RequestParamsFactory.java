@@ -133,7 +133,7 @@ class RequestParamsFactory {
 
       return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
     } catch (Exception ex) {
-      String errorMsg = "Error during creating send immage to Bitrix request";
+      String errorMsg = "Error during creating send image to Bitrix request";
       logger.error(errorMsg, ex);
       throw new IllegalStateException(errorMsg);
     }

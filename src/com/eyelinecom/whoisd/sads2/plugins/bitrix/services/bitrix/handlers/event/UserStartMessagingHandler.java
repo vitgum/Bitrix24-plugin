@@ -68,7 +68,7 @@ public class UserStartMessagingHandler extends CommonEventHandler implements Eve
         out.write(xml);
       }
     } catch (IOException ex) {
-      loggerMessagingSads.error("Error during user start messaging event", ex);
+      loggerMessagingSads.error("Error during user start messaging event: " + ex.getMessage() + ". Params: \n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n", ex);
     }
   }
 

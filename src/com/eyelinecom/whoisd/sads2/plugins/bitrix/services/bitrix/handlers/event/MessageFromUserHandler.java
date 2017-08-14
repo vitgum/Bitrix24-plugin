@@ -116,7 +116,7 @@ public class MessageFromUserHandler extends CommonEventHandler implements EventH
         out.write(xml);
       }
     } catch (IOException ex) {
-      loggerMessagingSads.error("Error during user start messaging event", ex);
+      loggerMessagingSads.error("Error during user start messaging event: " + ex.getMessage()  + ". Params: \n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n", ex);
     }
   }
 

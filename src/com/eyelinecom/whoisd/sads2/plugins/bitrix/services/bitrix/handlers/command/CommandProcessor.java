@@ -2,6 +2,7 @@ package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.handlers.comm
 
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.handlers.CommandHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.model.Command;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.PrettyPrintUtils;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -27,7 +28,7 @@ public class CommandProcessor {
       handler.handle(parameters);
 
     } catch (Exception ex) {
-      String error = "Command processing error: " + command;
+      String error = "Command processing error: " + command  + ". Params: \n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n";
       logger.error(error, ex);
     }
   }

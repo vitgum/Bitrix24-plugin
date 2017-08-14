@@ -2,9 +2,11 @@ package com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.handlers.even
 
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.handlers.EventHandler;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.model.Event;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.utils.PrettyPrintUtils;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,10 +30,17 @@ public class EventProcessor {
       handler.handle(parameters, response);
 
     } catch (Exception ex) {
-      String error = "Event processing error: " + event;
-      logger.error(error, ex);
+      String errorMsg = "Event processing error: " + event + ". Params: \n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n";
+      logger.error(errorMsg, ex);
       response.setCharacterEncoding("UTF-8");
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      try {
+        try (PrintWriter out = response.getWriter()) {
+          out.write(errorMsg);
+        }
+      } catch (Exception e) {
+        logger.error(e.getMessage(), ex);
+      }
     }
   }
 }

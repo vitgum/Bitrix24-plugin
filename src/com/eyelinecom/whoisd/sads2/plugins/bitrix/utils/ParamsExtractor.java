@@ -33,7 +33,7 @@ public class ParamsExtractor {
       event = parameters.get("event")[0];
       return Event.valueOf(event.toUpperCase());
     } catch (Exception ex) {
-      logger.error("unknown event type: " + event, ex);
+      logger.error("unknown event type: " + event + ". Params: \n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n", ex);
       return null;
     }
   }
@@ -52,7 +52,7 @@ public class ParamsExtractor {
     try {
       return Command.valueOf(command.toUpperCase());
     } catch (Exception ex) {
-      logger.error("unknown command type: " + command);
+      logger.error("unknown command type: " + command + ". Params: \n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n");
       return null;
     }
   }
@@ -76,7 +76,7 @@ public class ParamsExtractor {
 
       return parameters.containsKey("locale") ? parameters.get("locale")[0] : parameters.get("data[PARAMS][LANGUAGE]")[0];
     } catch (Exception ex) {
-      logger.error("Unable to extract language", ex);
+      logger.error("Unable to extract language. Params: \n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n", ex);
       return "en";
     }
   }
@@ -126,7 +126,7 @@ public class ParamsExtractor {
       return parameters.get("event.type")[0];
     } catch (Exception ex) {
 
-      logger.error("Unable to extract event type", ex);
+      logger.error("Unable to extract event type. Params: \n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n", ex);
       return null;
     }
   }
@@ -136,7 +136,7 @@ public class ParamsExtractor {
       return parameters.get("event.media_type")[0];
     } catch (Exception ex) {
 
-      logger.error("Unable to extract event media type", ex);
+      logger.error("Unable to extract event media type. Params: \n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n", ex);
       return null;
     }
   }
@@ -167,7 +167,7 @@ public class ParamsExtractor {
       return parameters.get("event.url")[0];
     } catch (Exception ex) {
 
-      logger.error("Unable to extract image url", ex);
+      logger.error("Unable to extract image url. Params: \n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n", ex);
       return null;
     }
   }
@@ -193,6 +193,6 @@ public class ParamsExtractor {
         return item[1];
     }
 
-    throw new IllegalStateException("Unable to extract " + paramName + " from URL");
+    throw new IllegalStateException("Unable to extract " + paramName + " from URL: " + url);
   }
 }

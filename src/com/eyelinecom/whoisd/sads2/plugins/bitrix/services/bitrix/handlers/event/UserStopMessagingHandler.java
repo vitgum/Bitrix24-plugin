@@ -83,23 +83,27 @@ public class UserStopMessagingHandler extends CommonEventHandler implements Even
 
         Queue queue = getProcessingQueue(userId, serviceId, application);
         if (queue == null) {
-          loggerMessagingSads.error("USER_STOP_MESSAGING response:\n MISSED QUEUE" + "\n");
+          String errorMsg = "USER_STOP_MESSAGING response:\n MISSED QUEUE\n. Params: \n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n";
+          loggerMessagingSads.error(errorMsg);
           response.setCharacterEncoding("UTF-8");
           response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          try {
+            try (PrintWriter out = response.getWriter()) {
+              out.write(errorMsg);
+            }
+          } catch (Exception e) {
+            logger.error(e.getMessage(), ex);
+          }
           return;
         }
 
-        try {
-          final String escapedRedirectBackBtnUrl = queue.getBackPage();
-          final String unescapedRedirectBackPageUrl = EncodingUtils.unescape(escapedRedirectBackBtnUrl);
-          final String encodedAndEscapedBackPageOriginal = ParamsExtractor.extractParamFromUrl(unescapedRedirectBackPageUrl, "back_page_original");
-          final String resultUrl = EncodingUtils.unescape(EncodingUtils.decode(encodedAndEscapedBackPageOriginal));
-          redirect(response, resultUrl);
-        } catch (Exception e) {
-          loggerMessagingSads.error("Unable to redirect", e);
-        }
+        final String escapedRedirectBackBtnUrl = queue.getBackPage();
+        final String unescapedRedirectBackPageUrl = EncodingUtils.unescape(escapedRedirectBackBtnUrl);
+        final String encodedAndEscapedBackPageOriginal = ParamsExtractor.extractParamFromUrl(unescapedRedirectBackPageUrl, "back_page_original");
+        final String resultUrl = EncodingUtils.unescape(EncodingUtils.decode(encodedAndEscapedBackPageOriginal));
+        redirect(response, resultUrl);
       } catch (Exception e) {
-        loggerMessagingSads.error("Unable to redirect", e);
+        loggerMessagingSads.error("Unable to redirect: " + e.getMessage() + ". Params: \n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n", e);
       }
     }
   }
@@ -114,7 +118,7 @@ public class UserStopMessagingHandler extends CommonEventHandler implements Even
 
       response.sendRedirect(redirectUrl);
     } catch (IOException ex) {
-      loggerMessagingSads.error("Error during user stop messaging event", ex);
+      loggerMessagingSads.error("Error during user stop messaging event: " + ex.getMessage() + ". Redirect url without invalidate session: " + url, ex);
     }
   }
 
@@ -131,7 +135,7 @@ public class UserStopMessagingHandler extends CommonEventHandler implements Even
         out.write(xml);
       }
     } catch (IOException ex) {
-      loggerMessagingSads.error("Error during sending error message", ex);
+      loggerMessagingSads.error("Error during sending error message: " + ex.getMessage()  + ". Params: \n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n", ex);
     }
   }
 
