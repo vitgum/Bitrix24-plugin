@@ -5,6 +5,8 @@ import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.message.IncomeMessage;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.operator.Operator;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.user.User;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
@@ -33,15 +35,18 @@ public class Queue {
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "app_id", unique = false, nullable = false)
+  @NotFound(action = NotFoundAction.IGNORE)
   private Application application;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name="user_id", unique = false, nullable = false)
   @NotNull(message = "User can't be null")
+  @NotFound(action = NotFoundAction.IGNORE)
   private User user;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name="operator_id", unique = false, nullable = true)
+  @NotFound(action = NotFoundAction.IGNORE)
   private Operator operator;
 
   @Column(name = "protocol", nullable = false, unique = false, length = 255)
@@ -51,6 +56,7 @@ public class Queue {
   private String serviceId;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "queue", cascade = {CascadeType.PERSIST})
+  @NotFound(action = NotFoundAction.IGNORE)
   private List<IncomeMessage> incomeMessages = new ArrayList<>();
 
   @Column(name = "back_page", nullable = true, unique = false, columnDefinition = "TEXT", length = 65535)
