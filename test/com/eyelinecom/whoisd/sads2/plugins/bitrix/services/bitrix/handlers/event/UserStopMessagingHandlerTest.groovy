@@ -55,9 +55,8 @@ class UserStopMessagingHandlerTest extends DBTestBase {
    */
   void testNoProcessingQueue() {
     //init
-    Application application = InitHelper.preInstallApplication(db)
-    User user = InitHelper.preInstallUser(db)
-    Queue awaiting = InitHelper.preInstallAwaitingQueue(db, application, user, "SOME_TEXT")
+    InitHelper.preInstallApplication(db)
+    InitHelper.preInstallUser(db)
     MockFor messageDeliveryProviderMock = new MockFor(MessageDeliveryProvider)
     MessageDeliveryProvider messageDeliveryProviderDelegate = messageDeliveryProviderMock.proxyDelegateInstance()
 
@@ -68,7 +67,7 @@ class UserStopMessagingHandlerTest extends DBTestBase {
 
 
     //verify
-    ModelStateChecker.assertExistsOnlyOneQueue(db, awaiting)
+    ModelStateChecker.assertNoQueues(db)
     messageDeliveryProviderMock.verify(messageDeliveryProviderDelegate)
   }
 

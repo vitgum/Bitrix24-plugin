@@ -9,9 +9,9 @@ import com.eyelinecom.whoisd.sads2.plugins.bitrix.model.queue.QueueType;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.bitrix.model.BitrixRequestType;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.DBService;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.ApplicationDAO;
+import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.dao.QueueDAO;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.query.ApplicationQuery;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.query.ChatQuery;
-import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.db.query.QueueQuery;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.MessageDeliveryProvider;
 import com.eyelinecom.whoisd.sads2.plugins.bitrix.services.messaging.ResourceBundleController;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -20,10 +20,7 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledExecutorService;
@@ -213,7 +210,7 @@ public class BitrixApiService implements BitrixApiProvider {
         List<Application> applications = ApplicationQuery.active(s).list();
         for (Application application : applications) {
 
-          List<Queue> byApplication = QueueQuery.byApplication(application, s).list();
+          List<Queue> byApplication = QueueDAO.getAppQueues(application, s);
 
           List<Queue> awaitingQueue = byApplication.stream().filter(q->q.getType() == QueueType.AWAITING).collect(Collectors.toList());
           List<Queue> processingQueue = byApplication.stream().filter(q->q.getType() == QueueType.PROCESSING).collect(Collectors.toList());
