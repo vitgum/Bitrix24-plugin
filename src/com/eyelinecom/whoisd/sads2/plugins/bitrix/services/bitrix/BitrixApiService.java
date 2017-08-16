@@ -210,7 +210,7 @@ public class BitrixApiService implements BitrixApiProvider {
       MessageDeliveryProvider messageDeliveryProvider = PluginContext.getInstance().getMessageDeliveryProvider();
       ResourceBundleController resourceBundleController = PluginContext.getInstance().getResourceBundleController();
       db.vtx(s -> {
-        List<Application> applications = ApplicationQuery.all(s).list();
+        List<Application> applications = ApplicationQuery.active(s).list();
         for (Application application : applications) {
 
           List<Queue> byApplication = QueueQuery.byApplication(application, s).list();
