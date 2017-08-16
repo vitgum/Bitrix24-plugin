@@ -257,7 +257,7 @@ public class BitrixApiService implements BitrixApiProvider {
     private void renewRefreshTokens() {
       DBService db = PluginContext.getInstance().getDBService();
       db.vtx(s -> {
-        List<Application> applications = ApplicationQuery.all(s).list();
+        List<Application> applications = ApplicationQuery.active(s).list();
         for (Application application : applications) {
           bitrixApiClient.refreshToken(application.getDomain(), application.getRefreshToken());
         }
