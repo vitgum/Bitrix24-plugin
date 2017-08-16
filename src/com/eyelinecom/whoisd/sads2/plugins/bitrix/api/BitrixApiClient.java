@@ -119,7 +119,7 @@ public class BitrixApiClient {
   }
 
   private static boolean isError(ObjectNode response) {
-    return response.has("error");
+    return response != null && response.has("error");
   }
 
   private static String getRestEndpoint(String domain) {
