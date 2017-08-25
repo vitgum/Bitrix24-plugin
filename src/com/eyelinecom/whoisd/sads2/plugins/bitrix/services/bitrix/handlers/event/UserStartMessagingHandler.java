@@ -18,12 +18,17 @@ import org.apache.log4j.Logger;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * author: Artem Voronov
  */
 public class UserStartMessagingHandler extends CommonEventHandler implements EventHandler {
+
+  private Set<String> forbiddenProtocols = new HashSet<>(Arrays.asList(new String[]{"ussd", "xhtml_mp"}));
 
   private static final Logger logger = Logger.getLogger("BITRIX_PLUGIN");
   private static final Logger loggerMessagingSads = Logger.getLogger("BITRIX_PLUGIN_MESSAGING_WITH_SADS");
@@ -56,7 +61,7 @@ public class UserStartMessagingHandler extends CommonEventHandler implements Eve
       loggerMessagingSads.debug("USER_START_MESSAGING request:\n" + PrettyPrintUtils.toPrettyMap(parameters) + "\n");
 
     final String protocol = ParamsExtractor.getProtocol(parameters);
-    final String xml = "ussd".equals(protocol) ? generateUssdNotSupportedPage(parameters) : generateSupportedProtocolPage(parameters);
+    final String xml = forbiddenProtocols.contains(protocol) ? generateProtocolNotSupportedPage(parameters) : generateSupportedProtocolPage(parameters);
 
     if (loggerMessagingSads.isDebugEnabled())
       loggerMessagingSads.debug("USER_START_MESSAGING response:\n" + PrettyPrintUtils.toPrettyXml(xml));
@@ -98,8 +103,8 @@ public class UserStartMessagingHandler extends CommonEventHandler implements Eve
     return application == null ? generateErrorPage(parameters) : generateBasicPage(parameters);
   }
 
-  private String generateUssdNotSupportedPage(Map<String, String[]> parameters) {
+  private String generateProtocolNotSupportedPage(Map<String, String[]> parameters) {
     final String lang = ParamsExtractor.getLanguage(parameters);
-    return TemplateUtils.createErrorPage(getLocalizedMessage(lang, "error.ussd.not.supported"), getLocalizedMessage(lang, "start.again"));
+    return TemplateUtils.createErrorPage(getLocalizedMessage(lang, "error.protocol.not.supported"), getLocalizedMessage(lang, "start.again"));
   }
 }
