@@ -36,6 +36,11 @@
     <ivy:retrieve type="jar,bundle" pattern="${basedir}/libdev/[artifact]-[revision].[ext]" conf="bitrix-plugin-dev" haltonfailure="true"/>
   </target>
 
+  <target name="liquibase">
+    <delete file="${distr.dir}/liquibase.zip"/>
+    <zip destfile="${distr.dir}/liquibase.zip" basedir="db/liquibase"/>
+  </target>
+
   <target name="javac" description="Компилирует код с помощью javac">
     <delete dir="${classes.dir}" failonerror="false"/>
     <mkdir dir="${classes.dir}"/>
@@ -55,7 +60,7 @@
     </antcall>
   </target>
 
-  <target name="distr" depends="compile">
+  <target name="distr" depends="resolve, compile, liquibase">
     <delete file="${distr.dir}/${module.name}.war" failonerror="false"/>
     <mkdir dir="${distr.dir}"/>
 
