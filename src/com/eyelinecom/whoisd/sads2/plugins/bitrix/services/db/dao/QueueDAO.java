@@ -127,6 +127,7 @@ public class QueueDAO {
     });
   }
 
+  @SuppressWarnings("unchecked")
   public List<IncomeMessage> getMessages(Integer queueId) {
     return db.tx(s -> {
       Queue queue = getQueue(queueId, s);
